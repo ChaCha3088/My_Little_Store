@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+
+    <div>
+        <div class="py-5 text-center">
+            <h2>테이블 목록</h2>
+        </div>
+            <table th:if="${storeTableFindDtoWithOrderFindDtos.size() > 0}" class="table table-striped table-hover">
+                <thead>
+                <tr>
+                    <th>테이블 번호</th>
+                    <th>테이블 상태</th>
+                </tr>
+                </thead>
+                <tbody th:each="storeTableFindDtoWithOrderFindDto : ${storeTableFindDtoWithOrderFindDtos}" th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}(memberId = ${memberId}, storeId = ${storeTableFindDtoWithOrderFindDto.storeId}, storeTableId = ${storeTableFindDtoWithOrderFindDto.id})}'|">
+                    <td th:text="${storeTableFindDtoWithOrderFindDto.id}"></td>
+                    <td th:text="${storeTableFindDtoWithOrderFindDto.storeTableStatus}"></td>
+                </tbody>
+
+            </table>
+
+    </div>
+
+    <div class="jumbotron">
+        <button class="w-75 btn btn-primary btn-lg"
+                th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/new(memberId = ${memberId}, storeId = ${storeId})}'|"
+                type="button">테이블 등록
+        </button>
+    </div>
+
+    <div th:replace="fragments/footer :: footer" />
+
+</div> <!-- /container -->
+
+</body>
+</html>

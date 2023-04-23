@@ -1,0 +1,71 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+
+    <div class="py-5 text-center">
+        <h2>주문 상품 정보</h2>
+    </div>
+
+    <form role="form" th:action="@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}/orderItems/{orderItemId}/delete(memberId = ${memberId}, storeId = ${storeId}, storeTableId = ${storeTableId}, orderId = ${orderItemDtoWithItemFindDto.orderId}, orderItemId = ${orderItemDtoWithItemFindDto.id})}" th:object="${orderItemForm}" method="post">
+
+        <div style="display:none">
+            <label th:for="id">Id</label>
+            <input type="text" id="id" name="id" class="form-control" value="Id" th:value="${orderItemDtoWithItemFindDto.id}" readonly>
+        </div>
+
+        <div style="display:none">
+            <label th:for="orderId">주문 Id</label>
+            <input type="text" id="orderId" name="orderId" class="form-control" value="주문 Id" th:value="${orderItemDtoWithItemFindDto.orderId}" readonly>
+        </div>
+
+        <div style="display:none">
+            <label th:for="itemId">상품 Id</label>
+            <input type="text" id="itemId" name="itemId" class="form-control" value="상품 Id" th:value="${orderItemDtoWithItemFindDto.itemFindDto.id}" readonly>
+        </div>
+
+        <div>
+            <label for="name">상품명</label>
+            <input type="text" id="name" name="name" class="form-control" value="상품명" th:value="${orderItemDtoWithItemFindDto.getItemFindDto.name}" readonly>
+        </div>
+
+        <div>
+            <label for="price">가격</label>
+            <input type="text" id="price" name="price" class="form-control" value="가격" th:value="${orderItemDtoWithItemFindDto.price}" readonly>
+        </div>
+
+        <div>
+            <label for="count">수량</label>
+            <input type="text" id="count" name="count" class="form-control" value="수량" th:value="${orderItemDtoWithItemFindDto.count}" readonly>
+        </div>
+
+        <hr class="my-4">
+
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="w-75 btn btn-danger btn-lg">삭제</button>
+            </div>
+
+            <div class="col">
+                <button class="w-75 btn btn-primary btn-lg"
+                        th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}/orderItems/{orderItemId}/update(memberId = ${memberId}, storeId = ${storeId}, storeTableId = ${storeTableId}, orderId = ${orderItemDtoWithItemFindDto.orderId}, orderItemId = ${orderItemDtoWithItemFindDto.id})}'|"
+                        type="button">수정</button>
+            </div>
+
+            <div class="col">
+                <button class="w-75 btn btn-secondary btn-lg"
+                        th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}(memberId = ${memberId}, storeId = ${storeId}, storeTableId = ${storeTableId}, orderId = ${orderItemDtoWithItemFindDto.orderId})}'|"
+                        type="button">목록</button>
+            </div>
+        </div>
+
+    <div th:replace="fragments/footer :: footer" />
+
+</div> <!-- /container -->
+
+</body>
+</html>

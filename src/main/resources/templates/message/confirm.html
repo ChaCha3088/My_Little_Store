@@ -1,0 +1,30 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+
+    <head>
+    </head>
+    <body>
+        <th:block th:if="${messages.message != null && messages.confirmHref != null && messages.cancelHref != null}">
+            <script th:inline="javascript">
+                let message = [[${messages.message}]];
+                let confirmHref = [[${messages.confirmHref}]];
+                let cancelHref = [[${messages.cancelHref}]];
+                let form = document.createElement("form");
+
+                if (confirm(message)) {
+                    // 확인 버튼을 누르면 post 요청 보내기
+                    form.method = "POST";
+                    form.action = confirmHref;
+                    document.body.appendChild(form);
+                    form.submit();
+                } else {
+                    // 취소 버튼을 누르면 주문 상세 페이지로 이동
+                    form.method = "GET";
+                    form.action = cancelHref;
+                    document.body.appendChild(form);
+                    form.submit();
+                }
+            </script>
+        </th:block>
+    </body>
+</html>

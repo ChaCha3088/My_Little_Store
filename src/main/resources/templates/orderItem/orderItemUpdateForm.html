@@ -1,0 +1,50 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<style>
+    .fieldError {
+        border-color: #bd2130;
+    }
+</style>
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+
+    <form role="form" th:action="@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}/orderItems/{orderItemId}/update(memberId = ${memberId}, storeId = ${storeId}, storeTableId = ${storeTableId}, orderId = ${orderId}, orderItemId = ${orderItemFindDto.id})}" th:object="${orderItemForm}" method="post">
+        <div class="form-group" style="display:none">
+            <label th:for="id">Id</label>
+            <input type="text" id="id" name="id" class="form-control" placeholder="Id를 입력하세요." value="Id" th:value="${orderItemFindDto.id}"
+                   th:class="${#fields.hasErrors('id')}? 'form-control fieldError' : 'form-control'" readonly>
+            <p th:if="${#fields.hasErrors('id')}" th:errors="*{id}">부적절한 Id입니다.</p>
+        </div>
+
+        <div class="form-group" style="display:none">
+            <label th:for="itemId">상품 Id</label>
+            <input type="text" id="itemId" name="itemId" class="form-control" placeholder="상품 Id를 입력하세요." value="상품 Id" th:value="${orderItemFindDto.itemId}"
+                   th:class="${#fields.hasErrors('itemId')}? 'form-control fieldError' : 'form-control'" readonly>
+            <p th:if="${#fields.hasErrors('itemId')}" th:errors="*{itemId}">부적절한 상품 Id입니다.</p>
+        </div>
+
+        <div class="form-group" style="display:none">
+            <label th:for="price">가격</label>
+            <input type="text" id="price" name="price" class="form-control" placeholder="가격을 입력하세요." value="가격" th:value="${orderItemFindDto.price}"
+                    th:class="${#fields.hasErrors('price')}? 'form-control fieldError' : 'form-control'" readonly>
+            <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}">부적절한 가격입니다.</p>
+        </div>
+        
+        <div class="form-group">
+            <label th:for="count">수량</label>
+            <input type="text" id="count" name="count" class="form-control" placeholder="수량을 입력하세요." value="수량" th:value="${orderItemFindDto.count}"
+                   th:class="${#fields.hasErrors('count')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('count')}" th:errors="*{count}">부적절한 수량입니다.</p>
+        </div>
+
+        <button type="submit" class="btn btn-success">완료</button>
+    </form>
+    <br/>
+    <div th:replace="fragments/footer :: footer" />
+</div> <!-- /container -->
+
+</body>
+</html>

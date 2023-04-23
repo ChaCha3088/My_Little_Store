@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader"/>
+
+    <div class="py-5 text-center">
+        <h2>상품 정보 입력</h2>
+    </div>
+
+    <form th:action="@{/members/{memberId}/stores/{storeId}/items/new(memberId = ${memberId}, storeId = ${storeId})}" th:object="${itemCreationForm}" method="post">
+        <div class="form-group">
+            <label th:for="name">상품명</label>
+            <input type="text" th:field="*{name}" class="form-control" placeholder="상품명을 입력하세요."
+                   th:class="${#fields.hasErrors('name')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('name')}" th:errors="*{name}">부적절한 이름입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="price">가격</label>
+            <input type="number" th:field="*{price}" class="form-control" placeholder="가격을 입력하세요."
+                   th:class="${#fields.hasErrors('price')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('price')}" th:errors="*{price}">부적절한 가격입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="stock">재고</label>
+            <input type="number" th:field="*{stock}" class="form-control" placeholder="재고를 입력하세요."
+                   th:class="${#fields.hasErrors('stock')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('stock')}" th:errors="*{stock}">부적절한 재고입니다.</p>
+        </div>
+
+        <button type="submit" class="btn btn-success">완료</button>
+    </form>
+    <br/>
+    <div th:replace="fragments/footer :: footer" />
+
+</div> <!-- /container -->
+
+</body>
+</html>

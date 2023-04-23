@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head th:replace="fragments/header :: header" />
+<body>
+
+<div class="container">
+    <div th:replace="fragments/bodyHeader :: bodyHeader" />
+
+    <div>
+        <div class="py-5 text-center">
+            <h2>주문 정보</h2>
+        </div>
+            <table class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>주문 번호</th>
+                        <th>주문 시작 시간</th>
+                        <th>주문 종료 시간</th>
+                        <th>주문 상태</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <td th:text="${orderDto.id}"></td>
+                    <td th:text="${orderDto.startTime}"></td>
+                    <td th:text="${orderDto.endTime}"></td>
+                    <td th:text="${orderDto.orderStatus}"></td>
+                </tbody>
+            </table>
+    </div>
+
+    <div>
+        <div class="py-5 text-center">
+            <h2>주문 상품 목록</h2>
+        </div>
+            <table th:if="${orderItemFindDtos.size() > 0}" class="table table-striped table-hover">
+                <thead>
+                    <tr>
+                        <th>상품 이름</th>
+                        <th>상품 추가 일시</th>
+                        <th>상품 가격</th>
+                        <th>상품 수량</th>
+                    </tr>
+                </thead>
+                <tbody>
+                <tr th:each="orderItemFindDto : ${orderItemFindDtos}" th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}/orderItems/{orderItemId}(memberId = ${memberId}, storeId = ${orderDto.storeId}, storeTableId = ${orderDto.storeId}, orderId = ${orderItemFindDto.orderId}, orderItemId = ${orderItemFindDto.id})}'|">
+                    <td th:text="${orderItemFindDto.itemName}"></td>
+                    <td th:text="${orderItemFindDto.getOrderedTime}"></td>
+                    <td th:text="${orderItemFindDto.price}"></td>
+                    <td th:text="${orderItemFindDto.count}"></td>
+                </tbody>
+            </table>
+    </div>
+
+    <div class="jumbotron">
+        <button class="w-75 btn btn-primary btn-lg"
+                th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}/orderItems/new(memberId = ${memberId}, storeId = ${orderDto.storeId}, storeTableId = ${orderDto.storeId}, orderId = ${orderDto.id})}'|"
+                type="button">상품 주문하기
+        </button>
+    </div>
+
+    <!--정산 버튼-->
+    <div class="jumbotron">
+        <button class="w-75 btn btn-primary btn-lg"
+                th:onclick="|location.href='@{/members/{memberId}/stores/{storeId}/storeTables/{storeTableId}/orders/{orderId}/payments/new(memberId = ${memberId}, storeId = ${orderDto.storeId}, storeTableId = ${orderDto.storeId}, orderId = ${orderDto.id})}'|"
+                type="button">정산하기
+        </button>
+    </div>
+
+    <div th:replace="fragments/footer :: footer" />
+
+</div> <!-- /container -->
+
+</body>
+</html>
