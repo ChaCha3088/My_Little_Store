@@ -43,10 +43,6 @@ public class Jwt {
 
     //== 비즈니스 로직 ==//
     public void updateRefreshToken(String refreshToken) {
-        if (this.expiredAt.isBefore(LocalDateTime.now())) {
-            throw new RefreshTokenException(JwtErrorMessage.NOT_EXPIRED_YET.getMessage());
-        }
-
         this.refreshToken = refreshToken;
         this.expiredAt = LocalDateTime.now().plusDays(7);
     }

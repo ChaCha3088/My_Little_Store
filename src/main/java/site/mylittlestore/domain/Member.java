@@ -78,6 +78,8 @@ public class Member extends BaseEntity {
         this.status = MemberStatus.ACTIVE;
     }
 
+    //== 비즈니스 로직 ==//
+
     public void updateMemberName(String name) {
         this.name = name;
     }
@@ -92,6 +94,15 @@ public class Member extends BaseEntity {
                 .street(street)
                 .zipcode(zipcode)
                 .build();
+    }
+
+    //== 테스트 로직 ==//
+    public void switchRole() {
+        if (this.role == MemberRole.ADMIN) {
+            this.role = MemberRole.MEMBER;
+        } else {
+            this.role = MemberRole.ADMIN;
+        }
     }
 
     //==연관관계 메소드==//

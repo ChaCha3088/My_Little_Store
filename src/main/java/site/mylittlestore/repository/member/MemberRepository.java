@@ -7,6 +7,6 @@ import java.util.Optional;
 
 public interface MemberRepository extends JpaRepository<Member, Long>, MemberRepositoryQueryDsl {
     Optional<Member> findActiveById(Long id);
-    Optional<Member> findByName(String name);
     Optional<Member> findActiveByEmail(String email);
+    Optional<Long> findActiveIdByEmail(String email);
 }

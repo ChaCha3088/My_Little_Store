@@ -22,11 +22,8 @@ import java.util.stream.Collectors;
 @Transactional(readOnly = true)
 @RequiredArgsConstructor
 public class MemberService {
-
-
     private final MemberRepository memberRepository;
     private final StoreRepository storeRepository;
-
 
     public MemberFindDto findMemberFindDtoById(Long memberId) throws NoSuchMemberException {
         return memberRepository.findActiveById(memberId)
@@ -100,6 +97,20 @@ public class MemberService {
 
         //회원의 정보 저장
         memberRepository.save(findMemberById);
+    }
+
+    /**
+     * 테스트용
+     * @param memberId
+     */
+    @Transactional
+    public void switchRole(Long memberId) {
+        Member member = memberRepository.findActiveById(memberId)
+                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
+
+        member.switchRole();
+
+        memberRepository.save(member);
     }
 
     private Member findById(Long memberId) throws NoSuchMemberException {

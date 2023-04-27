@@ -5,18 +5,20 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import site.mylittlestore.config.auth.PrincipalUserDetails;
+import site.mylittlestore.domain.Member;
 import site.mylittlestore.domain.auth.Jwt;
+import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 import site.mylittlestore.exception.auth.jwt.NoSuchJwtException;
 import site.mylittlestore.exception.auth.jwt.NotValidJwtException;
+import site.mylittlestore.exception.member.NoSuchMemberException;
 import site.mylittlestore.repository.jwt.JwtRepository;
 import site.mylittlestore.repository.member.MemberRepository;
 
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.time.LocalDateTime;
@@ -49,14 +51,23 @@ public class JwtService {
 
     private static final String BEARER = "Bearer ";
 
-    public String createAccessToken(Authentication authentication) {
-        PrincipalUserDetails principalUserDetails = (PrincipalUserDetails) authentication.getPrincipal();
+    public Jwt findByRefreshToken(String refreshToken) {
+        return jwtRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
+    }
+
+    @Transactional
+    public void deleteByRefreshToken(HttpServletResponse response, String refreshToken) {
+        jwtRepository.deleteByRefreshToken(refreshToken);
+    }
+
+    public String createAccessToken(String email) {
 
         return jwt.create()
                 .withIssuer("myLittleStore")
                 .withSubject("accessToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
-                .withClaim("email", principalUserDetails.getMember().getEmail())
+                .withClaim("email", email)
                 .sign(Algorithm.HMAC512(secret));
     }
 
@@ -66,58 +77,60 @@ public class JwtService {
      * @return
      */
     @Transactional
-    public String createRefreshToken(Authentication authentication) {
-        PrincipalUserDetails principalUserDetails = (PrincipalUserDetails) authentication.getPrincipal();
+    public String createRefreshToken(String email) {
 
         //refresh token을 발급한다.
         String newRefreshToken = jwt.create()
                 .withIssuer("myLittleStore")
                 .withSubject("refreshToken")
-                .withSubject(principalUserDetails.getUsername())
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
                 .sign(Algorithm.HMAC512(secret));
 
-        //DB에 저장한다.
-        Jwt jwtEntity = Jwt.builder()
-                .member(principalUserDetails.getMember())
-                .refreshToken(newRefreshToken)
-                .build();
+        //기존 refresh token이 있으면, update
+        Member member = memberRepository.findActiveByEmail(email)
+                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
-        jwtRepository.save(jwtEntity);
+        jwtRepository.findByMemberId(member.getId())
+                .ifPresentOrElse(
+                        //이미 있으면, update
+                        jwtEntity -> jwtEntity.updateRefreshToken(newRefreshToken),
+                        //없으면, 새로 만든다.
+                        () -> {
+                            Jwt jwtEntity = Jwt.builder()
+                                    .member(member)
+                                    .refreshToken(newRefreshToken)
+                                    .build();
+                            jwtRepository.save(jwtEntity);
+                        });
 
         return newRefreshToken;
     }
 
     /**
-     * 만료기간을 확인하여, 만료기간이 지났으면, refresh token을 재발급한다.
-     * @param authentication
+     * 만료기간을 확인하여
+     * 만료기간이 지나지 않았으면, 기준 refresh token을 반환한다.
+     * 만료기간이 지났으면, refresh token을 재발급한다.
+     * @param email
      * @return
      * @throws NoSuchJwtException
      */
     @Transactional
-    public String getRefreshToken(Authentication authentication) throws NoSuchJwtException {
-
-        PrincipalUserDetails principalUserDetails = (PrincipalUserDetails) authentication.getPrincipal();
+    public String getRefreshToken(String email) throws NoSuchJwtException {
+        Member member = memberRepository.findActiveByEmail(email)
+                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
         //MemberId로 Refresh Token을 찾는다.
-        Jwt jwtEntity = jwtRepository.findByMemberId(principalUserDetails.getMember().getId())
-                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_JWT.getMessage()));
+        Jwt jwtEntity = jwtRepository.findByMemberId(member.getId())
+                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
 
-        //Jwt가 있으면, refresh token의 만료기간을 확인한다.
-        if (jwtEntity.getExpiredAt().isAfter(LocalDateTime.now())) {
-            //만료기간이 지났으면, refresh token을 재발급한다.
-            String createdRefreshToken = createRefreshToken(authentication);
+        //Jwt가 있으면, refresh token을 재발급한다.
+        String createdRefreshToken = createRefreshToken(email);
 
-            //Jwt를 업데이트한다.
-            jwtEntity.updateRefreshToken(createdRefreshToken);
+        //Jwt를 업데이트한다.
+        jwtEntity.updateRefreshToken(createdRefreshToken);
 
-            //재발급한 refresh token을 반환한다.
-            return createdRefreshToken;
-
-            //만료 기간이 지나지 않았으면, 기존 refresh token을 반환한다.
-        } else {
-            return jwtEntity.getRefreshToken();
-        }
+        //재발급한 refresh token을 반환한다.
+        return createdRefreshToken;
     }
 
     /**
@@ -126,7 +139,7 @@ public class JwtService {
     public void sendAccessToken(HttpServletResponse response, String accessToken) {
         response.setStatus(HttpServletResponse.SC_OK);
 
-        response.setHeader(accessTokenHeader, accessToken);
+        setAccessTokenOnCookie(response, accessToken);
     }
 
     /**
@@ -135,11 +148,11 @@ public class JwtService {
     public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
         response.setStatus(HttpServletResponse.SC_OK);
 
-        setAccessTokenHeader(response, accessToken);
-        setRefreshTokenHeader(response, refreshToken);
+        setAccessTokenOnCookie(response, accessToken);
+        setRefreshTokenOnCookie(response, refreshToken);
     }
 
-    public DecodedJWT decodeJwt(String token) {
+    public DecodedJWT decodeJwt(HttpServletResponse response, String token) {
         if (isTokenValid(token)) {
             return jwt.decodeJwt(token);
         } else {
@@ -169,7 +182,7 @@ public class JwtService {
                 .map(refreshToken -> refreshToken.replace(BEARER, ""));
     }
 
-    public Optional<String> extractEmail(String accessToken) {
+    public Optional<String> extractEmailFromAccessToken(String accessToken) {
         try {
             // 토큰 유효성 검사하는 데에 사용할 알고리즘이 있는 JWT verifier builder 반환
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secret))
@@ -187,25 +200,71 @@ public class JwtService {
             JWT.require(Algorithm.HMAC512(secret))
                     .build()
                     .verify(token);
+
             return true;
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             return false;
         }
+    }
+
+    @Transactional
+    public boolean isRefreshTokenExists(HttpServletResponse response, String token) {
+        Jwt jwt = jwtRepository.findByRefreshToken(token)
+                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
+
+        //DB의 refresh token과 일치하는지, 만료기간이 지났는지 확인
+        if (!jwt.getRefreshToken().equals(token) || jwt.getExpiredAt().isBefore(LocalDateTime.now())) {
+            //DB에서 지우고
+            jwtRepository.delete(jwt);
+
+            //cookie에서 지우고
+            deleteToken("accessToken", response);
+            deleteToken("refreshToken", response);
+
+            return false;
+        }
+
+        return true;
+    }
+
+    public void deleteAllTokens(HttpServletResponse response) {
+        deleteToken("accessToken", response);
+        deleteToken("refreshToken", response);
+    }
+
+    private static void deleteToken(String token, HttpServletResponse response) {
+        Cookie tokenCookie = new Cookie(token, "");
+        tokenCookie.setMaxAge(0);
+        tokenCookie.setHttpOnly(true);
+//        tokenCookie.setSecure(true);
+        tokenCookie.setPath("/");
+        response.addCookie(tokenCookie);
     }
 
     /**
      * AccessToken 헤더 설정
      */
-    private void setAccessTokenHeader(HttpServletResponse response, String accessToken) {
-        response.setHeader(accessTokenHeader, accessToken);
+    private void setAccessTokenOnCookie(HttpServletResponse response, String accessToken) {
+//        response.addHeader("Access-Control-Expose-Headers", accessTokenHeader);
+//        response.addHeader(accessTokenHeader, BEARER + accessToken);
+
+        Cookie cookie = new Cookie("accessToken", accessToken);
+        cookie.setMaxAge(Math.toIntExact(accessTokenExpiration));
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
 
     /**
      * RefreshToken 헤더 설정
      */
-    private void setRefreshTokenHeader(HttpServletResponse response, String refreshToken) {
-        response.setHeader(refreshTokenHeader, refreshToken);
+    private void setRefreshTokenOnCookie(HttpServletResponse response, String refreshToken) {
+        Cookie cookie = new Cookie("refreshToken", refreshToken);
+        cookie.setMaxAge(Math.toIntExact(refreshTokenExpiration));
+        cookie.setHttpOnly(true);
+//        cookie.setSecure(true);
+        cookie.setPath("/");
+        response.addCookie(cookie);
     }
-
-
 }

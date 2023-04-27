@@ -1,6 +1,7 @@
 package site.mylittlestore.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -27,6 +28,7 @@ public class MemberController {
     private final StoreService storeService;
 
     @GetMapping("/members")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     public String memberList(Model model) {
         List<MemberFindDto> findAllMemberFindDto = memberService.findAllMemberFindDto();
 
@@ -36,6 +38,7 @@ public class MemberController {
     }
 
     @GetMapping("/members/{memberId}")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     public String memberInfo(@PathVariable("memberId") Long memberId, Model model) {
         MemberFindDto memberFindDto = memberService.findMemberFindDtoById(memberId);
         List<StoreDto> storeDtos = storeService.findAllStoreDtoById(memberId);
@@ -44,33 +47,34 @@ public class MemberController {
         return "member/memberInfo";
     }
 
-    @GetMapping("/members/new")
-    public String memberCreationForm(Model model) {
-        model.addAttribute("memberCreationForm", new MemberSignUpForm());
-
-        return "member/memberCreationForm";
-    }
-
-    @PostMapping("/members/new")
-    public String createMember(@Valid MemberSignUpForm memberSignUpForm, BindingResult result) {
-
-        if (result.hasErrors()) {
-            return "member/memberCreationForm";
-        }
-
-        Long savedMemberId = memberService.joinMember(MemberCreationDto.builder()
-                .name(memberSignUpForm.getName())
-                .email(memberSignUpForm.getEmail())
-                .password(memberSignUpForm.getPassword())
-                .city(memberSignUpForm.getCity())
-                .street(memberSignUpForm.getStreet())
-                .zipcode(memberSignUpForm.getZipcode())
-                .build());
-
-        return "redirect:/members/"+savedMemberId;
-    }
+//    @GetMapping("/members/new")
+//    public String memberCreationForm(Model model) {
+//        model.addAttribute("memberCreationForm", new MemberSignUpForm());
+//
+//        return "member/memberCreationForm";
+//    }
+//
+//    @PostMapping("/members/new")
+//    public String createMember(@Valid MemberSignUpForm memberSignUpForm, BindingResult result) {
+//
+//        if (result.hasErrors()) {
+//            return "member/memberCreationForm";
+//        }
+//
+//        Long savedMemberId = memberService.joinMember(MemberCreationDto.builder()
+//                .name(memberSignUpForm.getName())
+//                .email(memberSignUpForm.getEmail())
+//                .password(memberSignUpForm.getPassword())
+//                .city(memberSignUpForm.getCity())
+//                .street(memberSignUpForm.getStreet())
+//                .zipcode(memberSignUpForm.getZipcode())
+//                .build());
+//
+//        return "redirect:/members/"+savedMemberId;
+//    }
 
     @GetMapping("/members/{memberId}/update")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     public String memberUpdateForm(@PathVariable("memberId") Long memberId, Model model) {
         model.addAttribute("memberFindDto", memberService.findMemberFindDtoById(memberId));
         model.addAttribute("memberUpdateForm", new MemberUpdateForm());
@@ -79,6 +83,7 @@ public class MemberController {
     }
 
     @PostMapping("/members/{memberId}/update")
+    @PreAuthorize("hasRole('ROLE_MEMBER')")
     public String updateMember(@PathVariable("memberId") Long memberId, @Valid MemberUpdateForm memberUpdateForm, BindingResult result, Model model) {
 
         if (result.hasErrors()) {

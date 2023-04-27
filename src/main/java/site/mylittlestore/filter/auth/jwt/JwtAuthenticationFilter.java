@@ -19,13 +19,13 @@ import java.util.concurrent.ConcurrentHashMap;
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         super(authenticationManager);
-//        setFilterProcessesUrl("/auth/login");
+        setFilterProcessesUrl("/auth/login/oauth2/authorization");
     }
 
     //로그인 요청이 들어오면 로그인 시도하는 메소드
     //1. username, password 받아서
     //2. 정상인지 로그인 시도 -> AuthenticationManager로 로그인 시도
-    //3. PrincipalDetailsService  호출 -> loadUserByUsername() 함수 실행
+    //3. PrincipalDetailsService 호출 -> loadUserByUsername() 함수 실행
     //4. PrincipalDetails를 세션에 담고 (권한 관리를 위해서)
     //5. JWT를 만들어서 응답해주면 됨
     @Override
@@ -43,13 +43,11 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         String password = Optional.ofNullable(concurrentHashMap.get("password"))
                 .orElseThrow(() -> new PasswordException(PasswordErrorMessage.PASSWORD_IS_EMPTY.getMessage()));
 
-        //로그인 토큰 생성
-        Authentication authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        //authentication 생성
+        Authentication authentication = new UsernamePasswordAuthenticationToken(email, password);
 
         //PrincipalUserDetailsService의 loadUserByUsername() 함수가 실행됨
-        Authentication authentication = super.getAuthenticationManager().authenticate(authenticationToken);
-
-        return authentication;
+        return super.getAuthenticationManager().authenticate(authentication);
     }
 
     //attemptAuthentication 실행 후 인증이 정상적으로 되었으면 successfulAuthentication 함수가 실행됨

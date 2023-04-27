@@ -39,4 +39,19 @@ public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {
                         .fetchOne()
         );
     }
+
+    @Override
+    public Optional<Long> findActiveIdByEmail(String email) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return Optional.ofNullable(
+                queryFactory
+                        .select(member.id)
+                        .from(member)
+                        .where(member.email.eq(email)
+                                .and(member.status.eq(MemberStatus.ACTIVE)))
+                        .fetchOne()
+        );
+    }
+
 }
