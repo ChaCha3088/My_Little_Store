@@ -43,15 +43,24 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
         //registrationId는 우리가 등록한 provider의 이름
         String registrationId = userRequest.getClientRegistration().getRegistrationId();
         Map<String, Object> attributes;
+
+        //카카오는 kakao_account 안에 있음
+        if (registrationId.equals("kakao")) {
+            attributes = Optional.ofNullable((Map<String, Object>) oAuth2User.getAttributes().get("kakao_account"))
+                    .orElseThrow(() -> new OAuth2AuthenticationException(OAuth2ErrorMessage.NO_ATTRIBUTE.getMessage()));
+            providerId = Optional.ofNullable((String) attributes.get("id"))
+                    .orElseThrow(() -> new OAuth2AuthenticationException(OAuth2ErrorMessage.NO_PROVIDER_ID.getMessage()));
+        }
         //네이버는 response 안에 있음
-        if (registrationId.equals("naver")) {
+        else if (registrationId.equals("naver")) {
             attributes = Optional.ofNullable((Map<String, Object>) oAuth2User.getAttributes().get("response"))
                     .orElseThrow(() -> new OAuth2AuthenticationException(OAuth2ErrorMessage.NO_ATTRIBUTE.getMessage()));
             providerId = Optional.ofNullable((String) attributes.get("id"))
                     .orElseThrow(() -> new OAuth2AuthenticationException(OAuth2ErrorMessage.NO_PROVIDER_ID.getMessage()));
 
+        }
         //구글은 바로 있음
-        } else if (registrationId.equals("google")) {
+        else if (registrationId.equals("google")) {
             attributes = oAuth2User.getAttributes();
             providerId = Optional.ofNullable((String) attributes.get("sub"))
                     .orElseThrow(() -> new OAuth2AuthenticationException(OAuth2ErrorMessage.NO_PROVIDER_ID.getMessage()));
@@ -77,6 +86,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
             return new PrincipalUserDetails(member, attributes);
 
         } catch (NoSuchOAuth2Exception e) {
+            //OAuth2는 없지만, Member가 있을 때
             try {
                 //OAuth2가 없으면, Member를 찾는다.
                 Member member = memberRepository.findActiveByEmail(email)

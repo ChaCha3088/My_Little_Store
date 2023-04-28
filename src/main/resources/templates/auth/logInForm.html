@@ -17,8 +17,9 @@
 
 <!--OAuth 로그인 버튼을 표시한다.-->
     <div class="py-5 text-center">
-        <a th:href="@{/auth/login/oauth2/authorization/google}" class="btn btn-lg btn-primary">Google 로그인</a>
+        <a th:href="@{/auth/login/oauth2/authorization/kakao}" class="btn btn-lg btn-primary">Kakao 로그인</a>
         <a th:href="@{/auth/login/oauth2/authorization/naver}" class="btn btn-lg btn-primary">Naver 로그인</a>
+        <a th:href="@{/auth/login/oauth2/authorization/google}" class="btn btn-lg btn-primary">Google 로그인</a>
     </div>
 
     <form role="form" action="/auth/login" th:object="${memberLogInForm}" method="POST">
