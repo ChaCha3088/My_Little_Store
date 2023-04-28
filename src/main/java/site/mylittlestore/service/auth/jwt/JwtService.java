@@ -251,7 +251,7 @@ public class JwtService {
         Cookie cookie = new Cookie("accessToken", accessToken);
         cookie.setMaxAge(Math.toIntExact(accessTokenExpiration));
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         response.addCookie(cookie);
     }
@@ -263,7 +263,7 @@ public class JwtService {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
         cookie.setMaxAge(Math.toIntExact(refreshTokenExpiration));
         cookie.setHttpOnly(true);
-//        cookie.setSecure(true);
+        cookie.setSecure(true);
         cookie.setPath("/");
         response.addCookie(cookie);
     }

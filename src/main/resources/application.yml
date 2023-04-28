@@ -58,6 +58,14 @@ jwt:
       expiration: 604800000 # 7일 (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> d) * 7L(d -> w))
       header: Authorization-refresh
 
+#HTTPS
+server:
+  ssl:
+    key-store: ChaChaKeyStore.p12
+    key-store-type: PKCS12
+    key-store-password: ${KEY_STORE_PASSWORD}
+    key-alias: ChaChaKeyStore
+
 
 # p6spy
 logging:

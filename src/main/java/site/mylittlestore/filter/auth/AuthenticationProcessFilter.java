@@ -130,8 +130,14 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
-                //refresh token이 없으면, 인증 실패
+                //refresh token도 없으면, 인증이 없는 것
                 else {
+                    //예외로 메인 페이지는 볼 수 있음
+                    if (request.getRequestURI().equals("/")) {
+                        filterChain.doFilter(request, response); //다음 필터 호출
+                        return;
+                    }
+
                     response.sendRedirect("/auth/login");
                     return;
                 }
