@@ -2,17 +2,18 @@ package site.mylittlestore.config.auth.oauth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Component;
 import site.mylittlestore.service.auth.jwt.JwtService;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2LogoutHandler implements LogoutHandler {
+public class JwtLogoutHandler implements LogoutHandler {
     private final JwtService jwtService;
 
     @Override
@@ -29,10 +30,16 @@ public class OAuth2LogoutHandler implements LogoutHandler {
             }
         }
 
-        jwtService.deleteAllTokens(response);
-
         if (!refreshToken.isBlank()) {
             jwtService.deleteByRefreshToken(response, refreshToken);
+        }
+
+        jwtService.deleteAllTokens(response);
+
+        try {
+            response.sendRedirect("/auth/login");
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 }

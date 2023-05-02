@@ -4,7 +4,7 @@ import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.OAuth2User;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -22,11 +22,11 @@ public class PrincipalUserDetails implements UserDetails, OAuth2User {
         this.member = member;
     }
 
-    //OAuth 로그인 생성자
-    public PrincipalUserDetails(Member member, Map<String, Object> attributes) {
-        this.member = member;
-        this.attributes = attributes;
-    }
+//    //OAuth 로그인 생성자
+//    public PrincipalUserDetails(Member member, Map<String, Object> attributes) {
+//        this.member = member;
+//        this.attributes = attributes;
+//    }
 
     @Override
     public String getUsername() {

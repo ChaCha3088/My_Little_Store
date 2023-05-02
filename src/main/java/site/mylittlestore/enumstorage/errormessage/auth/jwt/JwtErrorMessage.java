@@ -9,7 +9,7 @@ public enum JwtErrorMessage {
     NOT_VALID_JWT("유효하지 않은 JWT입니다."),
     ACCESS_TOKEN_NOT_FOUND("Access Token이 존재하지 않습니다."),;
 
-    private String message;
+    private final String message;
 
     JwtErrorMessage(String message) {
         this.message = message;

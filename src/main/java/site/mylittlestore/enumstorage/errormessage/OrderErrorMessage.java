@@ -12,7 +12,7 @@ public enum OrderErrorMessage {
     ORDER_ALREADY_HAS_END_TIME("이미 종료 시간이 존재합니다."),
     ORDER_HAS_NO_ORDER_ITEM("주문에 주문 상품이 존재하지 않습니다."),;
 
-    private String message;
+    private final String message;
 
     OrderErrorMessage(String message) {
         this.message = message;

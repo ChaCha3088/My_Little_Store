@@ -7,14 +7,13 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.dto.store.StoreToggleStatusDto;
 import site.mylittlestore.dto.store.StoreUpdateDto;
 import site.mylittlestore.form.StoreCreationForm;
 import site.mylittlestore.form.StoreUpdateForm;
 import site.mylittlestore.service.ItemService;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 import site.mylittlestore.service.StoreService;
 import site.mylittlestore.service.OrderService;
 

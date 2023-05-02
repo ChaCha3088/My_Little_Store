@@ -3,14 +3,13 @@ package site.mylittlestore.filter.auth;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import site.mylittlestore.config.auth.PrincipalUserDetails;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.domain.auth.Jwt;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
@@ -25,7 +24,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.util.Collection;
 import java.util.List;
 
 
@@ -46,7 +44,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
      */
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().startsWith(NO_CHECK_URL) || request.getRequestURI().startsWith("/error") || request.getRequestURI().startsWith("/css") || request.getRequestURI().startsWith("/js") || request.getRequestURI().startsWith("/img")) {
+        if (request.getRequestURI().startsWith(NO_CHECK_URL) || request.getRequestURI().startsWith("/error") || request.getRequestURI().startsWith("/css") || request.getRequestURI().startsWith("/js") || request.getRequestURI().startsWith("/img") || request.getRequestURI().startsWith("/favicon.ico")) {
             filterChain.doFilter(request, response); // "/auth/login"으로 시작하는 URL 요청이 들어오면, 다음 필터 호출
             return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
         }
@@ -120,8 +118,10 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                         filterChain.doFilter(request, response); //다음 필터 호출
 
                         return; //RefreshToken이 유효한 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않도록 바로 return으로 필터 진행 막기
-                    } else {
-                        //refresh token인 유효하지 않거나 DB에 없으면, 인증 실패
+                    }
+
+                    //refresh token인 유효하지 않거나 DB에 없으면, 인증 실패
+                    else {
                         //모든 토큰 삭제
                         jwtService.deleteAllTokens(response);
 
@@ -130,6 +130,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                         return;
                     }
                 }
+
                 //refresh token도 없으면, 인증이 없는 것
                 else {
                     //예외로 메인 페이지는 볼 수 있음

@@ -12,7 +12,6 @@ import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.orderitem.OrderItemCreationDto;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.dto.store.StoreToggleStatusDto;
-import site.mylittlestore.dto.store.StoreUpdateDto;
 import site.mylittlestore.dto.storetable.StoreTableFindDtoWithOrderFindDto;
 import site.mylittlestore.enumstorage.errormessage.StoreTableErrorMessage;
 import site.mylittlestore.enumstorage.status.OrderStatus;
@@ -20,6 +19,7 @@ import site.mylittlestore.exception.store.NoSuchOrderException;
 import site.mylittlestore.exception.store.StoreClosedException;
 import site.mylittlestore.exception.storetable.NoSuchStoreTableException;
 import site.mylittlestore.repository.storetable.StoreTableRepository;
+import site.mylittlestore.service.member.MemberService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

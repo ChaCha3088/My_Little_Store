@@ -17,6 +17,7 @@ import site.mylittlestore.enumstorage.errormessage.ItemErrorMessage;
 import site.mylittlestore.enumstorage.status.ItemStatus;
 import site.mylittlestore.exception.item.NoSuchItemException;
 import site.mylittlestore.repository.item.ItemRepository;
+import site.mylittlestore.service.member.MemberService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

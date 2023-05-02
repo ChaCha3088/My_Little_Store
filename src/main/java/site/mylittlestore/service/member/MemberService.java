@@ -1,18 +1,20 @@
-package site.mylittlestore.service;
+package site.mylittlestore.service.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.member.MemberFindDto;
 import site.mylittlestore.dto.member.MemberPasswordUpdateDto;
 import site.mylittlestore.dto.member.MemberUpdateDto;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
+import site.mylittlestore.exception.member.DuplicateMemberException;
 import site.mylittlestore.exception.member.MemberPasswordDoesNotMatchException;
 import site.mylittlestore.exception.member.NoSuchMemberException;
 import site.mylittlestore.repository.member.MemberRepository;
+import site.mylittlestore.repository.member.temporarymember.TemporaryMemberRepository;
 import site.mylittlestore.repository.store.StoreRepository;
 
 import java.util.List;
@@ -23,7 +25,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MemberService {
     private final MemberRepository memberRepository;
-    private final StoreRepository storeRepository;
+    private final TemporaryMemberRepository temporaryMemberRepository;
 
     public MemberFindDto findMemberFindDtoById(Long memberId) throws NoSuchMemberException {
         return memberRepository.findActiveById(memberId)
@@ -40,6 +42,10 @@ public class MemberService {
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER_WITH_THAT_EMAIL.getMessage()))
                 //Dto로 변환
                 .toMemberFindDto();
+    }
+
+    public boolean isEmailValid(String email) {
+        return !(memberRepository.findActiveIdByEmail(email).isPresent());
     }
 
     public List<MemberFindDto> findAllMemberFindDto() {

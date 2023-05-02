@@ -56,7 +56,7 @@ public class PaymentMethod {
     //-- 비즈니스 로직 --//
     public void paymentMethodSuccess() {
         //결제 수단 상태가 이미 PAID거나 paymentMethodCompleteDateTime가 존재하면 예외 발생
-        if (paymentMethodStatus == PaymentMethodStatus.PAID | paymentMethodCompleteDateTime != null)
+        if (paymentMethodStatus == PaymentMethodStatus.PAID || paymentMethodCompleteDateTime != null)
             throw new PaymentMethodException(PaymentMethodErrorMessage.ALREADY_PAID.getMessage());
 
         //결제 수단 상태를 PAID로 변경

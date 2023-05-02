@@ -1,7 +1,9 @@
-package site.mylittlestore.domain;
+package site.mylittlestore.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import site.mylittlestore.domain.Address;
+import site.mylittlestore.domain.Store;
 import site.mylittlestore.domain.auth.Jwt;
 import site.mylittlestore.domain.auth.OAuth2;
 import site.mylittlestore.dto.member.MemberFindDto;
@@ -20,7 +22,6 @@ import java.util.List;
 @Getter
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 public class Member extends BaseEntity {
-
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "MEMBER_ID")
     private Long id;

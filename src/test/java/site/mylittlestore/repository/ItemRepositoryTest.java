@@ -16,7 +16,7 @@ import site.mylittlestore.repository.item.ItemRepository;
 import site.mylittlestore.repository.member.MemberRepository;
 import site.mylittlestore.repository.store.StoreRepository;
 import site.mylittlestore.service.ItemService;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 import site.mylittlestore.service.StoreService;
 
 import javax.persistence.EntityManager;

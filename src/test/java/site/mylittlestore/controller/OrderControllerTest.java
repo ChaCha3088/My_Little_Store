@@ -14,7 +14,7 @@ import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.order.OrderDto;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.enumstorage.status.OrderStatus;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 import site.mylittlestore.service.OrderService;
 import site.mylittlestore.service.StoreService;
 

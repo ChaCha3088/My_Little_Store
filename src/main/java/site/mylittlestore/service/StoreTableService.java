@@ -99,7 +99,7 @@ public class StoreTableService {
 
         //이 테이블의 주문, 주문 상품이 활성화된 것이 하나라도 있다면
         //예외 발생
-        if (orderRepository.findAllNotDeletedAndPaidByStoreId(storeTable.getOrder().getId()).size() > 0 | orderItemRepository.findAllByOrderIdAndStoreId(storeTable.getOrder().getId(), storeId).size() > 0) {
+        if (orderRepository.findAllNotDeletedAndPaidByStoreId(storeTable.getOrder().getId()).size() > 0 || orderItemRepository.findAllByOrderIdAndStoreId(storeTable.getOrder().getId(), storeId).size() > 0) {
             throw new StoreTableException(StoreTableErrorMessage.STILL_ORDER_OR_ORDER_ITEM_EXIST.getMessage());
         }
 

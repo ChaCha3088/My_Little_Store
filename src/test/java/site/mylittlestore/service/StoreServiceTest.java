@@ -13,6 +13,7 @@ import site.mylittlestore.enumstorage.errormessage.StoreErrorMessage;
 import site.mylittlestore.enumstorage.status.StoreStatus;
 import site.mylittlestore.exception.store.NoSuchStoreException;
 import site.mylittlestore.repository.item.ItemRepository;
+import site.mylittlestore.service.member.MemberService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

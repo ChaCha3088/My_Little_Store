@@ -1,21 +1,17 @@
 package site.mylittlestore.repository;
 
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInstance;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.transaction.annotation.Transactional;
-import site.mylittlestore.domain.Member;
 import site.mylittlestore.dto.member.MemberCreationDto;
-import site.mylittlestore.dto.member.MemberFindDto;
 import site.mylittlestore.repository.member.MemberRepository;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
-import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

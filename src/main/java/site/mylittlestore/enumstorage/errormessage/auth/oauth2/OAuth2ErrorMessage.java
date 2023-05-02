@@ -11,7 +11,7 @@ public enum OAuth2ErrorMessage  {
     NO_EMAIL("email이 존재하지 않습니다."),
     NO_NAME("name이 존재하지 않습니다.");
 
-    private String message;
+    private final String message;
 
     OAuth2ErrorMessage(String message) {
         this.message = message;

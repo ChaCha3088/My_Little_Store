@@ -8,13 +8,11 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.member.MemberFindDto;
 import site.mylittlestore.dto.member.MemberUpdateDto;
 import site.mylittlestore.dto.store.StoreDto;
-import site.mylittlestore.form.auth.MemberSignUpForm;
 import site.mylittlestore.form.MemberUpdateForm;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 import site.mylittlestore.service.StoreService;
 
 import javax.validation.Valid;

@@ -12,12 +12,12 @@ import site.mylittlestore.dto.item.ItemCreationDto;
 import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.orderitem.OrderItemCreationDto;
 import site.mylittlestore.dto.payment.PaymentDto;
-import site.mylittlestore.dto.payment.PaymentViewDto;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.dto.store.StoreToggleStatusDto;
 import site.mylittlestore.enumstorage.status.PaymentStatus;
 import site.mylittlestore.exception.payment.PaymentAlreadyExistException;
 import site.mylittlestore.exception.store.StoreClosedException;
+import site.mylittlestore.service.member.MemberService;
 
 import java.util.ArrayList;
 

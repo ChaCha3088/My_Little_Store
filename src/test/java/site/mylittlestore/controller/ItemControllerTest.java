@@ -19,7 +19,7 @@ import site.mylittlestore.enumstorage.status.ItemStatus;
 import site.mylittlestore.exception.item.NoSuchItemException;
 import site.mylittlestore.repository.item.ItemRepository;
 import site.mylittlestore.service.ItemService;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 import site.mylittlestore.service.StoreService;
 import site.mylittlestore.service.StoreTableService;
 

@@ -18,7 +18,7 @@ import java.util.Optional;
 
 @Component
 @RequiredArgsConstructor
-public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
+public class OAuth2LogInSuccessHandler implements AuthenticationSuccessHandler {
     private final JwtService jwtService;
 
     /**
@@ -38,34 +38,17 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String email = Optional.ofNullable(principalUserDetails.getUsername())
                 .orElseThrow(() -> new EmailException(EmailErrorMessage.EMAIL_IS_EMPTY.getMessage()));
 
+        //AccessToken을 발급한다.
         String accessToken = jwtService.createAccessToken(email);
-        try {
-            String refreshToken = jwtService.getRefreshToken(email);
 
-            //refreshToken이 재발급 되었을 경우
-            if (!jwtService.extractRefreshToken(request).equals(refreshToken)) {
-                //AccessToken과 RefreshToken을 Header에 담아 보낸다.
-                jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        //RefreshToken을 재발급한다.
+        String refreshToken = jwtService.createRefreshToken(email);
 
-            //refreshToken이 재발급 되지 않았을 경우
-            } else {
-                //AccessToken만 Header에 담아 보낸다.
-                jwtService.sendAccessToken(response, accessToken);
-            }
+        //AccessToken과 RefreshToken을 Header에 담아 보낸다.
+        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
 
-        //DB에 JwtEntity가 없을 경우,
-        } catch (NoSuchJwtException e) {
-            PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
-
-            //RefreshToken을 발급한다.
-            String newRefreshToken = jwtService.createRefreshToken(principal.getUsername());
-
-            //AccessToken과 RefreshToken을 Header에 담아 보낸다.
-            jwtService.sendAccessAndRefreshToken(response, accessToken, newRefreshToken);
-        } finally {
-            //OAuth2 로그인 성공 시, 메인 페이지로 이동
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.sendRedirect("/");
-        }
+        //OAuth2 로그인 성공 시, 메인 페이지로 이동
+        response.setStatus(HttpServletResponse.SC_OK);
+        response.sendRedirect("/");
     }
 }

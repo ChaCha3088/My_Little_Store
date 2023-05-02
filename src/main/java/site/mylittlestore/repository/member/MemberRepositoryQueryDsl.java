@@ -1,6 +1,6 @@
 package site.mylittlestore.repository.member;
 
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 
 import java.util.Optional;
 

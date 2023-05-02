@@ -7,17 +7,16 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.transaction.annotation.Transactional;
 import site.mylittlestore.dto.item.ItemCreationDto;
 import site.mylittlestore.dto.item.ItemFindDto;
 import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.orderitem.OrderItemFindDto;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.dto.store.StoreToggleStatusDto;
-import site.mylittlestore.dto.store.StoreUpdateDto;
 import site.mylittlestore.enumstorage.errormessage.OrderItemErrorMessage;
 import site.mylittlestore.exception.orderitem.OrderItemException;
 import site.mylittlestore.service.*;
+import site.mylittlestore.service.member.MemberService;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;

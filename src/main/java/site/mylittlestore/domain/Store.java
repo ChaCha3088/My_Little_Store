@@ -2,6 +2,7 @@ package site.mylittlestore.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.dto.store.StoreDto;
 import site.mylittlestore.dto.store.StoreDtoWithStoreTablesAndItems;
 import site.mylittlestore.enumstorage.status.StoreStatus;

@@ -1,4 +1,4 @@
-package site.mylittlestore.config.security;
+package site.mylittlestore.config.auth.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.AuthenticationProvider;
@@ -9,7 +9,7 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import site.mylittlestore.config.auth.PrincipalUserDetailsService;
+import site.mylittlestore.config.auth.member.PrincipalUserDetailsService;
 import site.mylittlestore.enumstorage.errormessage.auth.EmailErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.PasswordErrorMessage;
 import site.mylittlestore.exception.auth.EmailException;
@@ -18,16 +18,22 @@ import site.mylittlestore.util.Validator;
 
 @Component
 @RequiredArgsConstructor
-public class CustomAuthenticationProvider implements AuthenticationProvider {
+public class MemberAuthenticationProvider implements AuthenticationProvider {
     private final PrincipalUserDetailsService principalUserDetailsService;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;
 
+    /**
+     * 사용자가 입력한 email과 password를 검증하는 메소드
+     * @param authentication the authentication request object.
+     * @return
+     * @throws AuthenticationException
+     */
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
         //email 검증
         String email = (String) authentication.getPrincipal();
-        if (!validator.isValidEmail(email) | email.isBlank()) {
+        if (!validator.isValidEmail(email) || email.isBlank()) {
             throw new EmailException(EmailErrorMessage.NOT_VALID_EMAIL.getMessage());
         }
 

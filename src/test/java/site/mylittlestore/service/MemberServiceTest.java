@@ -6,7 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.dto.member.MemberUpdateDto;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
@@ -15,6 +15,7 @@ import site.mylittlestore.dto.member.MemberFindDto;
 import site.mylittlestore.dto.member.MemberPasswordUpdateDto;
 import site.mylittlestore.exception.member.NoSuchMemberException;
 import site.mylittlestore.repository.member.MemberRepository;
+import site.mylittlestore.service.member.MemberService;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;

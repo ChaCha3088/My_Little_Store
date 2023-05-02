@@ -19,7 +19,7 @@
 //import org.springframework.stereotype.Component;
 //import org.springframework.web.filter.OncePerRequestFilter;
 //import site.mylittlestore.config.auth.PrincipalUserDetails;
-//import site.mylittlestore.domain.Member;
+//import site.mylittlestore.domain.member.Member;
 //import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 //import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 //import site.mylittlestore.exception.auth.jwt.AccessTokenException;

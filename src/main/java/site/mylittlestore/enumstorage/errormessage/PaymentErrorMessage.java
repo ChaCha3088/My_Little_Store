@@ -12,7 +12,7 @@ public enum PaymentErrorMessage {
     PAID_PAYMENT_AMOUNT_IS_GREATER_THAN_INITIAL_PAYMENT_AMOUNT("결제 금액은 결제할 금액보다 클 수 없습니다."),
     PAYMENT_ALREADY_SUCCESS("결제가 이미 완료되었습니다.");
 
-    private String message;
+    private final String message;
 
     PaymentErrorMessage(String message) {
         this.message = message;

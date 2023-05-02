@@ -7,6 +7,7 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.jdbc.Sql;
 import site.mylittlestore.domain.*;
 import site.mylittlestore.domain.Order;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.enumstorage.errormessage.OrderErrorMessage;
 import site.mylittlestore.enumstorage.status.OrderStatus;
 import site.mylittlestore.exception.store.NoSuchOrderException;

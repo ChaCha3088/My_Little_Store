@@ -8,7 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import site.mylittlestore.config.auth.PrincipalUserDetails;
 import site.mylittlestore.dto.member.MemberFindDto;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 
 @Slf4j
 @Controller

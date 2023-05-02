@@ -19,6 +19,7 @@ import site.mylittlestore.enumstorage.errormessage.OrderItemErrorMessage;
 import site.mylittlestore.exception.orderitem.NoSuchOrderItemException;
 import site.mylittlestore.repository.orderitem.OrderItemRepository;
 import site.mylittlestore.service.*;
+import site.mylittlestore.service.member.MemberService;
 
 import java.util.List;
 

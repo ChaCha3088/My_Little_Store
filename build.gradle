@@ -32,15 +32,14 @@ repositories {
 }
 
 dependencies {
-	//MapStruct
+	//Lombok
 	implementation "org.projectlombok:lombok"
-	implementation 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
-	implementation 'org.mapstruct:mapstruct:1.5.3.Final'
-
 	annotationProcessor "org.projectlombok:lombok"
-	annotationProcessor "org.projectlombok:lombok-mapstruct-binding:0.2.0"
-	annotationProcessor "org.mapstruct:mapstruct-processor:1.5.3.Final"
-	//MapStruct
+	//Lombok
+
+//	//Regex
+//	implementation 'com.google.re2j:re2j:1.7'
+//	//Regex
 
 	//Spring
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -49,6 +48,9 @@ dependencies {
 	implementation group: 'org.springframework.boot', name: 'spring-boot-starter-validation', version: '2.7.8'
 	implementation 'com.github.gavlyukovskiy:p6spy-spring-boot-starter:1.5.6'
 	//Spring
+
+	//Mail
+	implementation 'org.springframework.boot:spring-boot-starter-mail'
 
 	//Spring Security
 	implementation 'org.springframework.boot:spring-boot-starter-security'

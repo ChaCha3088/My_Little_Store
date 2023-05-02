@@ -12,7 +12,7 @@ import org.springframework.transaction.annotation.Transactional;
 import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.store.StoreDtoWithStoreTablesAndItems;
 import site.mylittlestore.enumstorage.status.StoreStatus;
-import site.mylittlestore.service.MemberService;
+import site.mylittlestore.service.member.MemberService;
 import site.mylittlestore.service.StoreService;
 
 import javax.persistence.EntityManager;

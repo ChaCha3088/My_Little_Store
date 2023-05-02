@@ -12,14 +12,19 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
-import site.mylittlestore.config.auth.PrincipalUserDetailsService;
-import site.mylittlestore.config.auth.oauth.OAuth2LoginFailureHandler;
-import site.mylittlestore.config.auth.oauth.OAuth2LoginSuccessHandler;
-import site.mylittlestore.config.auth.oauth.OAuth2LogoutHandler;
+import site.mylittlestore.config.auth.member.MemberAuthenticationProvider;
+import site.mylittlestore.config.auth.member.MemberLogInFailureHandler;
+import site.mylittlestore.config.auth.member.MemberLogInSuccessHandler;
+import site.mylittlestore.config.auth.member.PrincipalUserDetailsService;
+import site.mylittlestore.config.auth.oauth.OAuth2LogInFailureHandler;
+import site.mylittlestore.config.auth.oauth.OAuth2LogInSuccessHandler;
+import site.mylittlestore.config.auth.oauth.JwtLogoutHandler;
 import site.mylittlestore.config.auth.oauth.PrincipalOAuth2UserService;
 import site.mylittlestore.enumstorage.role.MemberRole;
 import site.mylittlestore.filter.auth.AuthenticationProcessFilter;
-import site.mylittlestore.filter.auth.jwt.JwtAuthenticationFilter;
+import site.mylittlestore.filter.auth.jwt.MemberAuthenticationFilter;
+import site.mylittlestore.repository.member.temporarymember.TemporaryMemberRepository;
+import site.mylittlestore.service.auth.jwt.JwtService;
 
 @Configuration
 @EnableWebSecurity(debug = true) //Spring Securty 필터가 Spring Filter Chain에 등록된다.
@@ -28,11 +33,15 @@ import site.mylittlestore.filter.auth.jwt.JwtAuthenticationFilter;
 public class SecurityConfig {
     private final PrincipalUserDetailsService principalUserDetailsService;
     private final PrincipalOAuth2UserService principalOAuth2UserService;
-    private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
-    private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
-    private final OAuth2LogoutHandler OAuth2LogoutHandler;
+    private final TemporaryMemberRepository temporaryMemberRepository;
+    private final MemberLogInSuccessHandler memberLogInSuccessHandler;
+    private final MemberLogInFailureHandler memberLogInFailureHandler;
+    private final OAuth2LogInSuccessHandler oAuth2LoginSuccessHandler;
+    private final OAuth2LogInFailureHandler oAuth2LoginFailureHandler;
+    private final JwtService jwtService;
+    private final JwtLogoutHandler jwtLogoutHandler;
     private final AuthenticationProcessFilter authenticationProcessFilter;
-    private final CustomAuthenticationProvider customAuthenticationProvider;
+    private final MemberAuthenticationProvider memberAuthenticationProvider;
     private final CorsConfig corsConfig;
 
     @Bean
@@ -47,7 +56,7 @@ public class SecurityConfig {
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
                 .authorizeHttpRequests(authorize -> authorize
 //                        .antMatchers("/members/**").hasAuthority(MemberRole.ADMIN.toString())
-                        .antMatchers("/","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
+                        .antMatchers("/","/css/**","/img/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
                         .antMatchers("/auth/**").permitAll()
                         .anyRequest().authenticated()
                 );
@@ -63,32 +72,34 @@ public class SecurityConfig {
         //Filter
         http
                 .addFilterAfter(authenticationProcessFilter, LogoutFilter.class)
-                .addFilterAfter(jwtAuthenticationFilter(), AuthenticationProcessFilter.class);
-//                .addFilterAfter(jwtAuthorizationFilter, JwtAuthenticationFilter.class);
+                .addFilterAfter(memberAuthenticationFilter(), AuthenticationProcessFilter.class);
 
-//        //로그인
-//        http
-//                .formLogin()
-//                .loginPage("/auth/login")
-//                .loginProcessingUrl("/auth/login")
-//                .usernameParameter("email")
-//                .defaultSuccessUrl("/", true)
-//                .failureUrl("/auth/login?error")
-////                .failureHandler(new SimpleUrlAuthenticationFailureHandler("/auth/login?error"))
-//                .permitAll()
-//            .and()
-//                //로그아웃
-//                .logout()
-//                .logoutUrl("/auth/logout")
-//                .invalidateHttpSession(true)
-//                .deleteCookies("JSESSIONID");
-////                .exceptionHandling();
+        //로그인
+        http
+                .formLogin()
+                .loginPage("/auth/login")
+                .loginProcessingUrl("/auth/login/member")
+                .usernameParameter("email")
+                .passwordParameter("password")
+                .successHandler(memberLogInSuccessHandler)
+                .failureHandler(memberLogInFailureHandler)
+                .permitAll()
+            .and()
+                .userDetailsService(principalUserDetailsService)
+                .authenticationProvider(memberAuthenticationProvider)
+
+                //로그아웃
+                .logout()
+                .logoutUrl("/auth/logout")
+                .logoutSuccessUrl("/auth/login")
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID")
+                .addLogoutHandler(jwtLogoutHandler);
 
         //OAuth2 로그인
         http
                 .oauth2Login()
                 .loginPage("/auth/login")
-                .defaultSuccessUrl("/", true)
                 .authorizationEndpoint()
                 .baseUri("/auth/login/oauth2/authorization")
             .and()
@@ -99,24 +110,19 @@ public class SecurityConfig {
                 .userService(principalOAuth2UserService)
             .and()
                 .successHandler(oAuth2LoginSuccessHandler) // 동의하고 계속하기를 눌렀을 때 Handler 설정(
-                .failureHandler(oAuth2LoginFailureHandler) // 소셜 로그인 실패 시 핸들러 설정
-            .and()
-                .logout()
-                .logoutUrl("/auth/logout")
-                .logoutSuccessUrl("/auth/login")
-                .addLogoutHandler(OAuth2LogoutHandler);
+                .failureHandler(oAuth2LoginFailureHandler); // 소셜 로그인 실패 시 핸들러 설정
 
         return http.build();
     }
 
     @Bean
     public AuthenticationManager authenticationManager() {
-        return new ProviderManager(customAuthenticationProvider);
+        return new ProviderManager(memberAuthenticationProvider);
     }
 
     @Bean
-    public JwtAuthenticationFilter jwtAuthenticationFilter() {
-        return new JwtAuthenticationFilter(authenticationManager());
+    public MemberAuthenticationFilter memberAuthenticationFilter() {
+        return new MemberAuthenticationFilter(authenticationManager(), temporaryMemberRepository, jwtService, memberLogInSuccessHandler, memberLogInFailureHandler);
     }
 
     @Bean

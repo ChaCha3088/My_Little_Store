@@ -2,13 +2,13 @@ package site.mylittlestore.repository.member;
 
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.enumstorage.status.MemberStatus;
 
 import javax.persistence.EntityManager;
 import java.util.Optional;
 
-import static site.mylittlestore.domain.QMember.member;
+import static site.mylittlestore.domain.member.QMember.member;
 
 @RequiredArgsConstructor
 public class MemberRepositoryImpl implements MemberRepositoryQueryDsl {

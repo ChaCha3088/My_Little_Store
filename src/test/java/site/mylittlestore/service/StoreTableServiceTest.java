@@ -9,10 +9,10 @@ import site.mylittlestore.dto.item.ItemCreationDto;
 import site.mylittlestore.dto.member.MemberCreationDto;
 import site.mylittlestore.dto.store.StoreCreationDto;
 import site.mylittlestore.dto.store.StoreToggleStatusDto;
-import site.mylittlestore.dto.store.StoreUpdateDto;
 import site.mylittlestore.dto.storetable.StoreTableFindDto;
 import site.mylittlestore.dto.storetable.StoreTableFindDtoWithOrderFindDto;
 import site.mylittlestore.enumstorage.status.StoreTableStatus;
+import site.mylittlestore.service.member.MemberService;
 
 import javax.persistence.EntityManager;
 

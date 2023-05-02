@@ -11,7 +11,7 @@ public enum PaymentMethodErrorMessage {
     ALREADY_PAID("이미 지불된 결제 수단입니다."),
     PAYMENT_METHOD_COMPLETE_DATE_TIME_IS_NULL("결제 수단 완료 일시가 null입니다."),;
 
-    private String message;
+    private final String message;
 
     PaymentMethodErrorMessage(String message) {
         this.message = message;

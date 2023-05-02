@@ -9,7 +9,7 @@ public enum OrderItemErrorMessage {
     ORDER_ITEM_ALREADY_DELETED("이미 삭제된 주문 상품입니다."),
     ORDER_ITEM_ALREADY_PAID("이미 결제된 주문 상품입니다.");
 
-    private String message;
+    private final String message;
 
     OrderItemErrorMessage(String message) {
         this.message = message;

@@ -12,7 +12,7 @@ public enum StoreTableErrorMessage {
     STORE_TABLE_ALREADY_DELETED("이미 삭제된 테이블입니다."),
     STORE_TABLE_USING("테이블이 사용 중입니다.");
 
-    private String message;
+    private final String message;
 
     StoreTableErrorMessage(String message) {
         this.message = message;

@@ -8,7 +8,7 @@ import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.mylittlestore.config.auth.PrincipalUserDetails;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.domain.auth.OAuth2;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.oauth2.OAuth2ErrorMessage;
@@ -83,7 +83,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
                     .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
             //PrincipalDetails를 리턴한다.
-            return new PrincipalUserDetails(member, attributes);
+            return new PrincipalUserDetails(member);
 
         } catch (NoSuchOAuth2Exception e) {
             //OAuth2는 없지만, Member가 있을 때
@@ -105,7 +105,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2Repository.save(oAuth2);
 
                 //PrincipalDetails를 리턴한다.
-                return new PrincipalUserDetails(member, attributes);
+                return new PrincipalUserDetails(member);
 
             //OAuth2도 없고, Member도 없으면,
             } catch (NoSuchMemberException nsme) {
@@ -127,7 +127,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
                 oAuth2Repository.save(oAuth2);
 
                 //PrincipalDetails를 리턴한다.
-                return new PrincipalUserDetails(member, attributes);
+                return new PrincipalUserDetails(member);
             }
         }
     }

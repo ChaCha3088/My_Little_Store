@@ -3,7 +3,7 @@ package site.mylittlestore.service;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.domain.Store;
 import site.mylittlestore.domain.Item;
 import site.mylittlestore.dto.store.*;

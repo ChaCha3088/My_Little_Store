@@ -9,7 +9,7 @@ public enum ItemErrorMessage {
     NOT_ENOUGH_STOCK("재고가 부족합니다."),
     DUPLICATE_ITEM("이미 존재하는 아이템입니다.");
 
-    private String message;
+    private final String message;
 
     ItemErrorMessage(String message) {
         this.message = message;

@@ -1,7 +1,7 @@
 package site.mylittlestore.repository.member;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 
 import java.util.Optional;
 

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.domain.auth.Jwt;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
@@ -78,6 +78,9 @@ public class JwtService {
      */
     @Transactional
     public String createRefreshToken(String email) {
+        //email로 member를 찾는다.
+        Member member = memberRepository.findActiveByEmail(email)
+                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
         //refresh token을 발급한다.
         String newRefreshToken = jwt.create()
@@ -85,10 +88,6 @@ public class JwtService {
                 .withSubject("refreshToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
                 .sign(Algorithm.HMAC512(secret));
-
-        //기존 refresh token이 있으면, update
-        Member member = memberRepository.findActiveByEmail(email)
-                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
         jwtRepository.findByMemberId(member.getId())
                 .ifPresentOrElse(
@@ -104,33 +103,6 @@ public class JwtService {
                         });
 
         return newRefreshToken;
-    }
-
-    /**
-     * 만료기간을 확인하여
-     * 만료기간이 지나지 않았으면, 기준 refresh token을 반환한다.
-     * 만료기간이 지났으면, refresh token을 재발급한다.
-     * @param email
-     * @return
-     * @throws NoSuchJwtException
-     */
-    @Transactional
-    public String getRefreshToken(String email) throws NoSuchJwtException {
-        Member member = memberRepository.findActiveByEmail(email)
-                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
-
-        //MemberId로 Refresh Token을 찾는다.
-        Jwt jwtEntity = jwtRepository.findByMemberId(member.getId())
-                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
-
-        //Jwt가 있으면, refresh token을 재발급한다.
-        String createdRefreshToken = createRefreshToken(email);
-
-        //Jwt를 업데이트한다.
-        jwtEntity.updateRefreshToken(createdRefreshToken);
-
-        //재발급한 refresh token을 반환한다.
-        return createdRefreshToken;
     }
 
     /**

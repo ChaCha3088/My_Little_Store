@@ -4,7 +4,7 @@ import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import site.mylittlestore.domain.Member;
+import site.mylittlestore.domain.member.Member;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
