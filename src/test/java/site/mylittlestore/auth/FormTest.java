@@ -38,10 +38,10 @@ public class FormTest {
     private TemporaryMemberService temporaryMemberService;
 
     @Autowired
-    private JwtService jwtService;
+    private MemberService memberService;
 
     @Autowired
-    private MemberService memberService;
+    private JwtService jwtService;
 
     private String verificationCode = "";
 
@@ -52,9 +52,22 @@ public class FormTest {
     @Order(0)
     void validateEmail() throws Exception {
         mockMvc.perform(post("/auth/signup")
+                        .param("name", "Cha Cha")
+                        .param("email", "")
+                        .param("password", "abcde102938!")
+                        .param("passwordAgain", "abcde102938!")
+                        .param("city", "Seoul")
+                        .param("street", "Gangnam")
+                        .param("zipcode", "12345"))
+                .andExpect(status().isOk())
+                .andExpect(view().name("auth/signUpForm"))
+                .andExpect(model().attributeHasFieldErrors("memberSignUpForm", "email"));
+
+        mockMvc.perform(post("/auth/signup")
                 .param("name", "Cha Cha")
                 .param("email", "cha3088gmail.com")
                 .param("password", "abcde102938!")
+                .param("passwordAgain", "abcde102938!")
                 .param("city", "Seoul")
                 .param("street", "Gangnam")
                 .param("zipcode", "12345"))
@@ -66,6 +79,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmailcom")
                         .param("password", "abcde102938!")
+                        .param("passwordAgain", "abcde102938!")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -82,6 +96,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "")
+                        .param("passwordAgain", "")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -98,6 +113,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "dl@j102")
+                        .param("passwordAgain", "dl@j102")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -114,6 +130,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "aldsfkjaejkheufhuekh@kdjsffkdshjfjkshdfjlshdlkvnxcnvbxk10582subhskdfhskhdskjh!")
+                        .param("passwordAgain", "aldsfkjaejkheufhuekh@kdjsffkdshjfjkshdfjlshdlkvnxcnvbxk10582subhskdfhskhdskjh!")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -130,6 +147,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "kh@kdjsffkdshjfjskjh!")
+                        .param("passwordAgain", "kh@kdjsffkdshjfjskjh!")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -146,6 +164,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "khkdjsffkd1983")
+                        .param("passwordAgain", "khkdjsffkd1983")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -162,6 +181,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "khkdjsffk,d1983")
+                        .param("passwordAgain", "khkdjsffk,d1983")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -178,6 +198,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "khㅁd엇!sffk@d1983")
+                        .param("passwordAgain", "khㅁd엇!sffk@d1983")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -194,6 +215,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "khkdj!sfffk@d1983")
+                        .param("passwordAgain", "khkdj!sfffk@d1983")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))
@@ -210,6 +232,7 @@ public class FormTest {
                         .param("name", "Cha Cha")
                         .param("email", "cha3088@gmail.com")
                         .param("password", "khcha3088fk@d1983")
+                        .param("passwordAgain", "khcha3088fk@d1983")
                         .param("city", "Seoul")
                         .param("street", "Gangnam")
                         .param("zipcode", "12345"))

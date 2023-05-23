@@ -14,6 +14,7 @@ import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.dto.jwt.JwtFindDto;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
+import site.mylittlestore.exception.auth.jwt.NoSuchJwtException;
 import site.mylittlestore.exception.auth.jwt.NotValidJwtException;
 import site.mylittlestore.exception.member.NoSuchMemberException;
 import site.mylittlestore.repository.member.MemberRepository;
@@ -105,7 +106,6 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                     if (jwtService.isTokenValid(refreshToken) && jwtService.isRefreshTokenExists(response, refreshToken)) {
                         //refresh token이 유효하면
 
-
                         //토큰들 재발급
                         Member member = jwtService.reissueTokens(refreshToken, response);
 
@@ -142,7 +142,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
             }
 
         //해당 사용자가 없을 때
-        } catch (NoSuchMemberException e) {
+        } catch (NoSuchMemberException | NoSuchJwtException e) {
             //모든 토큰 삭제
             jwtService.deleteAllTokens(response);
 

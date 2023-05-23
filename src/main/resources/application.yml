@@ -77,7 +77,7 @@ jwt:
   secret: ${JWT_SECRET}
   token:
     access:
-      expiration: 3600000 # 1시간 (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h))
+      expiration: 300000 # 5분
       header: Authorization
     refresh:
       expiration: 604800000 # 7일 (1000L(ms -> s) * 60L(s -> m) * 60L(m -> h) * 24L(h -> d) * 7L(d -> w))

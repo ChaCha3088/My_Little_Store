@@ -251,7 +251,7 @@ public class JwtService {
 //        response.addHeader(accessTokenHeader, BEARER + accessToken);
 
         Cookie cookie = new Cookie("accessToken", accessToken);
-        cookie.setMaxAge(Math.toIntExact(accessTokenExpiration));
+        cookie.setMaxAge(Math.toIntExact(accessTokenExpiration / 1000));
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
@@ -263,7 +263,7 @@ public class JwtService {
      */
     private void setRefreshTokenOnCookie(HttpServletResponse response, String refreshToken) {
         Cookie cookie = new Cookie("refreshToken", refreshToken);
-        cookie.setMaxAge(Math.toIntExact(refreshTokenExpiration));
+        cookie.setMaxAge(Math.toIntExact(refreshTokenExpiration / 1000));
         cookie.setHttpOnly(true);
         cookie.setSecure(true);
         cookie.setPath("/");
