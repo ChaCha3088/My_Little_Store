@@ -6,6 +6,7 @@ import lombok.Getter;
 public enum PasswordErrorMessage {
     PASSWORD_DOES_NOT_MATCH("비밀번호가 일치하지 않습니다."),
     PASSWORD_IS_EMPTY("비밀번호를 입력해주세요."),
+    PASSWORD_AGAIN_IS_NOT_EQUAL("비밀번호 재입력이 일치하지 않습니다."),
     PASSWORD_IS_NOT_VALID("비밀번호가 유효하지 않습니다."),
     PASSWORD_IS_BLANK("비밀번호를 입력해주세요."),
     PASSWORD_FORMAT_IS_NOT_VALID("비밀번호는 대문자, 소문자, 특수문자, 숫자를 포함하여 8자 이상, 30자 이하여야 합니다."),

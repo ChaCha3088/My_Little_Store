@@ -5,6 +5,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import site.mylittlestore.domain.member.Member;
+import site.mylittlestore.dto.jwt.JwtFindDto;
 
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
@@ -34,7 +35,6 @@ public class Jwt {
     protected Jwt(String refreshToken, Member member) {
         this.refreshToken = refreshToken;
         this.expiredAt = LocalDateTime.now().plusDays(7);
-
         this.member = member;
         member.setJwt(this);
     }
@@ -43,5 +43,15 @@ public class Jwt {
     public void updateRefreshToken(String refreshToken) {
         this.refreshToken = refreshToken;
         this.expiredAt = LocalDateTime.now().plusDays(7);
+    }
+
+    //== Dto ==//
+    public JwtFindDto toJwtFindDto() {
+        return JwtFindDto.builder()
+                .id(id)
+                .refreshToken(refreshToken)
+                .expiredAt(expiredAt)
+                .memberId(member.getId())
+                .build();
     }
 }

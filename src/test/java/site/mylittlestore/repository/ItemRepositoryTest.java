@@ -107,7 +107,7 @@ class ItemRepositoryTest {
         em.clear();
 
         //when
-        List<ItemFindDto> findAllItemCreationDtoByStoreId = itemRepository.findAllByStoreId(storeTestId);
+        List<Item> findAllItemCreationDtoByStoreId = itemRepository.findAllByStoreId(storeTestId);
 
         //then
         assertThat(findAllItemCreationDtoByStoreId.size()).isEqualTo(2);

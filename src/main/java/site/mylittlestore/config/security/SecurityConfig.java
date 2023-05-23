@@ -27,7 +27,7 @@ import site.mylittlestore.repository.member.temporarymember.TemporaryMemberRepos
 import site.mylittlestore.service.auth.jwt.JwtService;
 
 @Configuration
-@EnableWebSecurity(debug = true) //Spring Securty 필터가 Spring Filter Chain에 등록된다.
+@EnableWebSecurity //Spring Securty 필터가 Spring Filter Chain에 등록된다.
 //@EnableGlobalMethodSecurity(securedEnabled = true) //secured 어노테이션 활성화
 @RequiredArgsConstructor
 public class SecurityConfig {

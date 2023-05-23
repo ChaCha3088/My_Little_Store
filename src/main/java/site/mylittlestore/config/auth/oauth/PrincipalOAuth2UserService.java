@@ -79,7 +79,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
                     .orElseThrow(() -> new NoSuchOAuth2Exception(OAuth2ErrorMessage.NO_SUCH_OAUTH_2.getMessage()));
 
             //있으면, 연관된 Member를 찾는다.
-            Member member = memberRepository.findActiveById(OAuth2.getMember().getId())
+            Member member = memberRepository.findNotDeletedById(OAuth2.getMember().getId())
                     .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
             //PrincipalDetails를 리턴한다.
@@ -89,7 +89,7 @@ public class PrincipalOAuth2UserService extends DefaultOAuth2UserService {
             //OAuth2는 없지만, Member가 있을 때
             try {
                 //OAuth2가 없으면, Member를 찾는다.
-                Member member = memberRepository.findActiveByEmail(email)
+                Member member = memberRepository.findNotDeletedByEmail(email)
                         .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
                 // OAuth2를 생성한다.

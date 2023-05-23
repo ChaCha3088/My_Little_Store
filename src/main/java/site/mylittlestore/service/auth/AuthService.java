@@ -1,4 +1,4 @@
-package site.mylittlestore.service;
+package site.mylittlestore.service.auth;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;

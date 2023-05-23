@@ -26,6 +26,27 @@ public class TemporaryMemberRepositoryImpl implements TemporaryMemberRepositoryQ
     }
 
     @Override
+    public Optional<TemporaryMember> findByEmail(String email) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return Optional.ofNullable(queryFactory
+                .selectFrom(temporaryMember)
+                .where(temporaryMember.email.eq(email))
+                .fetchOne());
+    }
+
+    @Override
+    public Optional<String> findVerificationCodeByEmail(String email) {
+        JPAQueryFactory queryFactory = new JPAQueryFactory(em);
+
+        return Optional.ofNullable(queryFactory
+                .select(temporaryMember.verificationCode)
+                .from(temporaryMember)
+                .where(temporaryMember.email.eq(email))
+                .fetchOne());
+    }
+
+    @Override
     public Optional<TemporaryMember> findByVerificationCode(String verificationCode) {
         JPAQueryFactory queryFactory = new JPAQueryFactory(em);
 

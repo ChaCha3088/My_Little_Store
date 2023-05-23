@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.transaction.annotation.Transactional;
 import site.mylittlestore.domain.member.Member;
 import site.mylittlestore.domain.auth.Jwt;
+import site.mylittlestore.dto.jwt.JwtFindDto;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 import site.mylittlestore.exception.auth.jwt.NoSuchJwtException;
@@ -51,9 +52,10 @@ public class JwtService {
 
     private static final String BEARER = "Bearer ";
 
-    public Jwt findByRefreshToken(String refreshToken) {
+    public JwtFindDto findJwtFindDtoByRefreshToken(String refreshToken) {
         return jwtRepository.findByRefreshToken(refreshToken)
-                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
+                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()))
+                .toJwtFindDto();
     }
 
     @Transactional
@@ -61,29 +63,62 @@ public class JwtService {
         jwtRepository.deleteByRefreshToken(refreshToken);
     }
 
-    public String createAccessToken(String email) {
+    /**
+     * access token, refresh token을 발급, DB에 저장한다.
+     * @param email
+     * @param response
+     */
+    @Transactional
+    public void issueTokens(String email, HttpServletResponse response) {
+        //email로 member를 찾는다.
+        Member member = memberRepository.findNotDeletedByEmail(email)
+                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
-        return jwt.create()
+        //refresh token을 발급한다.
+        String refreshToken = jwt.create()
+                .withIssuer("myLittleStore")
+                .withSubject("refreshToken")
+                .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
+                .sign(Algorithm.HMAC512(secret));
+
+        jwtRepository.findByMemberId(member.getId())
+                .ifPresentOrElse(
+                        //이미 있으면, update
+                        jwtEntity -> jwtEntity.updateRefreshToken(refreshToken),
+                        //없으면, 새로 만든다.
+                        () -> {
+                            Jwt jwtEntity = Jwt.builder()
+                                    .member(member)
+                                    .refreshToken(refreshToken)
+                                    .build();
+                            jwtRepository.save(jwtEntity);
+                        });
+
+        //access token을 발급한다.
+        String accessToken = jwt.create()
                 .withIssuer("myLittleStore")
                 .withSubject("accessToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
                 .withClaim("email", email)
                 .sign(Algorithm.HMAC512(secret));
+
+        //access token, refresh token을 헤더에 실어서 보낸다.
+        response.setStatus(HttpServletResponse.SC_OK);
+
+        setAccessTokenOnCookie(response, accessToken);
+        setRefreshTokenOnCookie(response, refreshToken);
     }
 
-    /**
-     * refresh token을 발급, DB에 저장한다.
-     * @param authentication
-     * @return
-     */
     @Transactional
-    public String createRefreshToken(String email) {
-        //email로 member를 찾는다.
-        Member member = memberRepository.findActiveByEmail(email)
-                .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
+    public Member reissueTokens(String refreshToken, HttpServletResponse response) {
+        //refreshToken으로 member를 찾는다.
+        Jwt jwt = jwtRepository.findByRefreshToken(refreshToken)
+                .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
+
+        Member member = jwt.getMember();
 
         //refresh token을 발급한다.
-        String newRefreshToken = jwt.create()
+        String newRefreshToken = this.jwt.create()
                 .withIssuer("myLittleStore")
                 .withSubject("refreshToken")
                 .withExpiresAt(new Date(System.currentTimeMillis() + refreshTokenExpiration))
@@ -102,26 +137,21 @@ public class JwtService {
                             jwtRepository.save(jwtEntity);
                         });
 
-        return newRefreshToken;
-    }
+        //access token을 발급한다.
+        String accessToken = this.jwt.create()
+                .withIssuer("myLittleStore")
+                .withSubject("accessToken")
+                .withExpiresAt(new Date(System.currentTimeMillis() + accessTokenExpiration))
+                .withClaim("email", member.getEmail())
+                .sign(Algorithm.HMAC512(secret));
 
-    /**
-     * AccessToken 헤더에 실어서 보내기
-     */
-    public void sendAccessToken(HttpServletResponse response, String accessToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
-
-        setAccessTokenOnCookie(response, accessToken);
-    }
-
-    /**
-     * AccessToken + RefreshToken 헤더에 실어서 보내기
-     */
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
+        //access token, refresh token을 헤더에 실어서 보낸다.
         response.setStatus(HttpServletResponse.SC_OK);
 
         setAccessTokenOnCookie(response, accessToken);
         setRefreshTokenOnCookie(response, refreshToken);
+
+        return member;
     }
 
     public DecodedJWT decodeJwt(HttpServletResponse response, String token) {
@@ -180,12 +210,12 @@ public class JwtService {
     }
 
     @Transactional
-    public boolean isRefreshTokenExists(HttpServletResponse response, String token) {
-        Jwt jwt = jwtRepository.findByRefreshToken(token)
+    public boolean isRefreshTokenExists(HttpServletResponse response, String refreshToken) {
+        Jwt jwt = jwtRepository.findByRefreshToken(refreshToken)
                 .orElseThrow(() -> new NoSuchJwtException(JwtErrorMessage.NO_SUCH_REFRESH_TOKEN.getMessage()));
 
         //DB의 refresh token과 일치하는지, 만료기간이 지났는지 확인
-        if (!jwt.getRefreshToken().equals(token) || jwt.getExpiredAt().isBefore(LocalDateTime.now())) {
+        if (!jwt.getRefreshToken().equals(refreshToken) || jwt.getExpiredAt().isBefore(LocalDateTime.now())) {
             //DB에서 지우고
             jwtRepository.delete(jwt);
 

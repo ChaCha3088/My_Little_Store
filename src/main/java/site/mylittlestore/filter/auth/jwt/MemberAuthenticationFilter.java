@@ -98,7 +98,7 @@ public class MemberAuthenticationFilter extends UsernamePasswordAuthenticationFi
 //                    .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_VERIFICATION_CODE.getMessage()));
 //
 //            //있다면, 이메일 인증 요구 페이지로 redirect
-//            response.sendRedirect("/auth/member/verification-email/notice/" + temporaryMemberId);
+//            response.sendRedirect("/auth/member/notice/verification-email/" + temporaryMemberId);
 //
 //        }
 //        catch (NoSuchTemporaryMemberException e)

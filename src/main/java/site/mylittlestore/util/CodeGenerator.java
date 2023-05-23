@@ -7,8 +7,6 @@ public class CodeGenerator {
     private static final String[] CODES = {
             "0123456789",
             "abcdefghijklmnopqrstuvwxyz",
-            "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
-            "!@#$&*_+"
     };
 
     public static String generateCode(int length) {

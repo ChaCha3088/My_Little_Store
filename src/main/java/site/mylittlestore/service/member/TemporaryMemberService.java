@@ -2,6 +2,7 @@ package site.mylittlestore.service.member;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import site.mylittlestore.domain.member.Member;
@@ -16,6 +17,7 @@ import site.mylittlestore.service.email.EmailService;
 import site.mylittlestore.util.CodeGenerator;
 import site.mylittlestore.util.email.Email;
 
+import javax.mail.MessagingException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
@@ -26,14 +28,20 @@ public class TemporaryMemberService {
     private final EmailService emailService;
     private final MemberRepository memberRepository;
     private final TemporaryMemberRepository temporaryMemberRepository;
+    private final PasswordEncoder passwordEncoder;
 
     public Long findIdByEmail(String email) throws NoSuchTemporaryMemberException {
         return temporaryMemberRepository.findIdByEmail(email)
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_EMAIL.getMessage()));
     }
 
+    public String findVerificationCodeByEmail(String email) throws NoSuchTemporaryMemberException {
+        return temporaryMemberRepository.findVerificationCodeByEmail(email)
+                .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_EMAIL.getMessage()));
+    }
+
     @Transactional
-    public Long joinTemporaryMember(MemberCreationDto memberCreationDto) throws DataIntegrityViolationException, UnsupportedEncodingException {
+    public Long joinTemporaryMember(MemberCreationDto memberCreationDto) throws DataIntegrityViolationException, UnsupportedEncodingException, MessagingException {
         //verificationCode 생성
         String verificationCode = CodeGenerator.generateCode(20);
 
@@ -41,7 +49,7 @@ public class TemporaryMemberService {
         Long temporaryMemberId = temporaryMemberRepository.save(TemporaryMember.builder()
                         .name(memberCreationDto.getName())
                         .email(memberCreationDto.getEmail())
-                        .password(memberCreationDto.getPassword())
+                        .password(passwordEncoder.encode(memberCreationDto.getPassword()))
                         .city(memberCreationDto.getCity())
                         .street(memberCreationDto.getStreet())
                         .zipcode(memberCreationDto.getZipcode())
@@ -62,9 +70,30 @@ public class TemporaryMemberService {
     }
 
     @Transactional
-    public void resendVerificationEmail(Long id) throws NoSuchTemporaryMemberException, UnsupportedEncodingException {
+    public void resendVerificationEmailById(Long id) throws NoSuchTemporaryMemberException, UnsupportedEncodingException, MessagingException {
         TemporaryMember temporaryMember = temporaryMemberRepository.findById(id)
                 .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_ID.getMessage()));
+
+        //verificationCode 생성
+        String verificationCode = CodeGenerator.generateCode(20);
+
+        //temporaryMember의 verificationCode 변경
+        temporaryMember.updateVerificationCode(verificationCode);
+
+        //이메일 발송
+        emailService.sendMail(Email.builder()
+                .subject(EmailMessage.VERIFICATION_EMAIL_SUBJECT.getMessage())
+                .receiver(temporaryMember.getEmail())
+                .message(EmailMessage.VERIFICATION_EMAIL_MESSAGE.getMessage() +
+                        EmailMessage.VERIFICATION_EMAIL_LINK.getMessage() +
+                        URLEncoder.encode(verificationCode, "UTF-8"))
+                .build());
+    }
+
+    @Transactional
+    public void resendVerificationEmailByEmail(String email) throws NoSuchTemporaryMemberException, UnsupportedEncodingException, MessagingException {
+        TemporaryMember temporaryMember = temporaryMemberRepository.findByEmail(email)
+                .orElseThrow(() -> new NoSuchTemporaryMemberException(TemporaryMemberErrorMessage.NO_SUCH_TEMPORARY_MEMBER_WITH_THAT_EMAIL.getMessage()));
 
         //verificationCode 생성
         String verificationCode = CodeGenerator.generateCode(20);

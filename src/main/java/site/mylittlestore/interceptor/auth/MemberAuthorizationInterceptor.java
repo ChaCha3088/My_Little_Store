@@ -41,7 +41,7 @@ public class MemberAuthorizationInterceptor implements HandlerInterceptor {
         PrincipalUserDetails principal = (PrincipalUserDetails) authentication.getPrincipal();
         String email = principal.getUsername();
 
-        Long memberId = memberRepository.findActiveIdByEmail(email)
+        Long memberId = memberRepository.findNotDeletedIdByEmail(email)
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
         String requestMemberId = request.getRequestURI().split("/")[2];

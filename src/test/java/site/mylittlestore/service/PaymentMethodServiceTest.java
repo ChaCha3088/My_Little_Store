@@ -31,7 +31,7 @@ class PaymentMethodServiceTest {
 
 
         //when
-        paymentMethodService.findAllPaymentMethodDtosByOrderIdAndPaymentId();
+//        paymentMethodService.findAllPaymentMethodDtosByOrderIdAndPaymentId();
 
         //then
 

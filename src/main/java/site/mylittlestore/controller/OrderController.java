@@ -11,7 +11,6 @@ import site.mylittlestore.enumstorage.errormessage.StoreErrorMessage;
 import site.mylittlestore.enumstorage.status.StoreStatus;
 import site.mylittlestore.exception.store.NoSuchOrderException;
 import site.mylittlestore.exception.storetable.OrderAlreadyExistException;
-import site.mylittlestore.message.Message;
 import site.mylittlestore.service.OrderItemService;
 import site.mylittlestore.service.OrderService;
 import site.mylittlestore.service.StoreService;
@@ -52,10 +51,9 @@ public class OrderController {
         //가게가 닫혀있으면, 가게를 열어야합니다. 메시지 출력
         if (storeDtoById.getStoreStatus().equals(StoreStatus.CLOSE.toString())) {
             //팝업 알림창
-            model.addAttribute("messages", Message.builder()
-                    .message(StoreErrorMessage.STORE_CLOSED.getMessage())
-                    .href("/members/" + memberId + "/stores/" + storeId)
-                    .build());
+            model.addAttribute("message", StoreErrorMessage.STORE_CLOSED.getMessage())
+                    .addAttribute("href", "/members/" + memberId + "/stores/" + storeId);
+
             return "message/message";
         }
 

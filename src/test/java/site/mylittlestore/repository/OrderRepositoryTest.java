@@ -214,7 +214,7 @@ class OrderRepositoryTest {
 
 
         //when
-        orderRepository.findNotDeletedAndPaidWithStoreTableAndOrderItemsByIdAndPaymentId();
+//        orderRepository.findNotDeletedAndPaidWithStoreTableAndOrderItemsByIdAndPaymentId();
 
         //then
 

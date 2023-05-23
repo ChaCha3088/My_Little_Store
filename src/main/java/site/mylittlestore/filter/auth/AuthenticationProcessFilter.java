@@ -1,5 +1,6 @@
 package site.mylittlestore.filter.auth;
 
+import com.auth0.jwt.exceptions.JWTVerificationException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -10,7 +11,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import site.mylittlestore.config.auth.PrincipalUserDetails;
 import site.mylittlestore.domain.member.Member;
-import site.mylittlestore.domain.auth.Jwt;
+import site.mylittlestore.dto.jwt.JwtFindDto;
 import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.jwt.JwtErrorMessage;
 import site.mylittlestore.exception.auth.jwt.NotValidJwtException;
@@ -66,13 +67,14 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
             //access token이 있을 때
             if (!accessToken.isBlank()) {
                 //access token이 유효하면
-                if (jwtService.isTokenValid(accessToken)) {
+                try
+                {
                     //access token에서 email 추출
                     String email = jwtService.extractEmailFromAccessToken(accessToken)
                             .orElseThrow(() -> new NotValidJwtException(JwtErrorMessage.NOT_VALID_JWT.getMessage()));
 
                     //해당 email을 사용하는 유저 객체 반환
-                    Member member = memberRepository.findActiveByEmail(email)
+                    Member member = memberRepository.findNotDeletedByEmail(email)
                             .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
                     //access token으로 인증 처리
@@ -83,7 +85,8 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                 }
 
                 //access token이 유효하지 않으면
-                else {
+                catch (JWTVerificationException e)
+                {
                     //access token이 유효하지 않으면, 인증 실패
                     //모든 토큰 삭제
                     jwtService.deleteAllTokens(response);
@@ -101,16 +104,10 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                     //refresh token을 검증
                     if (jwtService.isTokenValid(refreshToken) && jwtService.isRefreshTokenExists(response, refreshToken)) {
                         //refresh token이 유효하면
-                        //access token 재발급
-                        Jwt jwt = jwtService.findByRefreshToken(refreshToken);
-                        Member member = jwt.getMember();
-                        String newAccessToken = jwtService.createAccessToken(member.getEmail());
 
-                        //refresh token 재발급
-                        String newRefreshToken = jwtService.createRefreshToken(member.getEmail());
 
-                        //access token, refresh token을 쿠키에 담아서 응답
-                        jwtService.sendAccessAndRefreshToken(response, newAccessToken, newRefreshToken);
+                        //토큰들 재발급
+                        Member member = jwtService.reissueTokens(refreshToken, response);
 
                         //access token을 재발급 받았으므로, 인증 성공
                         saveAuthentication(member);

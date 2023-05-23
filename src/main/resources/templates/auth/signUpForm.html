@@ -1,11 +1,7 @@
 <!DOCTYPE HTML>
 <html xmlns:th="http://www.thymeleaf.org">
 <head th:replace="fragments/header :: header" />
-<style>
-    .fieldError {
-        border-color: #bd2130;
-    }
-</style>
+
 <body>
 
 <div class="container">
@@ -30,9 +26,15 @@
         </div>
         <div class="form-group">
             <label th:for="password">비밀번호</label>
-            <input type="text" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요."
+            <input type="password" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요."
                    th:class="${#fields.hasErrors('password')}? 'form-control fieldError' : 'form-control'">
             <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">부적절한 비밀번호입니다.</p>
+        </div>
+        <div class="form-group">
+            <label th:for="passwordAgain">비밀번호 재입력</label>
+            <input type="password" th:field="*{passwordAgain}" class="form-control" placeholder="비밀번호를 다시 입력하세요."
+                   th:class="${#fields.hasErrors('passwordAgain')}? 'form-control fieldError' : 'form-control'">
+            <p th:if="${#fields.hasErrors('passwordAgain')}" th:errors="*{passwordAgain}">부적절한 비밀번호입니다.</p>
         </div>
         <div class="form-group">
             <label th:for="city">도시</label>
@@ -56,7 +58,7 @@
     </form>
     <br/>
     <div th:replace="fragments/footer :: footer" />
-</div> <!-- /container -->
+</div>
 
 </body>
 </html>

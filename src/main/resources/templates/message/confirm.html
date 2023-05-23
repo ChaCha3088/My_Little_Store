@@ -4,11 +4,11 @@
     <head>
     </head>
     <body>
-        <th:block th:if="${messages.message != null && messages.confirmHref != null && messages.cancelHref != null}">
+        <th:block th:if="${message != null && confirmHref != null && cancelHref != null}">
             <script th:inline="javascript">
-                let message = [[${messages.message}]];
-                let confirmHref = [[${messages.confirmHref}]];
-                let cancelHref = [[${messages.cancelHref}]];
+                let message = [[${message}]];
+                let confirmHref = [[${confirmHref}]];
+                let cancelHref = [[${cancelHref}]];
                 let form = document.createElement("form");
 
                 if (confirm(message)) {

@@ -47,13 +47,13 @@
                 <label th:for="email">이메일</label>
                 <input type="text" th:field="*{email}" class="form-control" placeholder="이메일을 입력하세요."
                        th:class="${#fields.hasErrors('email')}? 'form-control fieldError' : 'form-control'">
-                <p th:if="${#fields.hasErrors('email')}" th:errors="*{email}">부적절한 이메일입니다.</p>
+                <p th:if="${memberLogInError.email}" th:text="${memberLogInError.email}">부적절한 이메일입니다.</p>
             </div>
             <div class="form-group">
                 <label th:for="password">비밀번호</label>
-                    <input type="text" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요."
+                    <input type="password" th:field="*{password}" class="form-control" placeholder="비밀번호를 입력하세요."
                        th:class="${#fields.hasErrors('password')}? 'form-control fieldError' : 'form-control'">
-                <p th:if="${#fields.hasErrors('password')}" th:errors="*{password}">부적절한 비밀번호입니다.</p>
+                <p th:if="${memberLogInError.password}" th:text="${memberLogInError.password}">부적절한 비밀번호입니다.</p>
             </div>
 
             <div class="d-flex justify-content-center">
@@ -64,7 +64,7 @@
 
     <br/>
     <div th:replace="fragments/footer :: footer" />
-</div> <!-- /container -->
+</div>
 
 
 </body>

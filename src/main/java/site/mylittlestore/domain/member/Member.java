@@ -2,12 +2,14 @@ package site.mylittlestore.domain.member;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
+import org.springframework.security.core.AuthenticationException;
 import site.mylittlestore.domain.Address;
 import site.mylittlestore.domain.Store;
 import site.mylittlestore.domain.auth.Jwt;
 import site.mylittlestore.domain.auth.OAuth2;
 import site.mylittlestore.dto.member.MemberFindDto;
 import site.mylittlestore.entity.BaseEntity;
+import site.mylittlestore.enumstorage.errormessage.auth.LogInErrorMessage;
 import site.mylittlestore.enumstorage.role.MemberRole;
 import site.mylittlestore.enumstorage.status.MemberStatus;
 
@@ -30,7 +32,6 @@ public class Member extends BaseEntity {
 
     @NotBlank
     @Column(unique = true)
-    @Email
     private String email;
 
     private String password;
@@ -58,6 +59,11 @@ public class Member extends BaseEntity {
     @OneToOne(mappedBy = "member")
     private Jwt jwt;
 
+    @NotNull
+    private int logInAttempt = 0;
+
+    private String passwordVerificationCode;
+
     @Builder
     protected Member(String name, String email, String password, String city, String street, String zipcode) {
         this.name = name;
@@ -80,13 +86,12 @@ public class Member extends BaseEntity {
     }
 
     //== 비즈니스 로직 ==//
-
     public void updateMemberName(String name) {
         this.name = name;
     }
 
-    public void updateMemberPassword(String password) {
-        this.password = password;
+    public void changePassword(String newPassword) {
+        this.password = newPassword;
     }
 
     public void updateMemberAddress(String city, String street, String zipcode) {
@@ -95,6 +100,37 @@ public class Member extends BaseEntity {
                 .street(street)
                 .zipcode(zipcode)
                 .build();
+    }
+
+    public void unlock() {
+        if (this.status == MemberStatus.LOCKED) {
+            this.status = MemberStatus.ACTIVE;
+            this.logInAttempt = 0;
+        }
+    }
+
+    public MemberStatus countUpLogInAttempt() {
+        this.logInAttempt += 1;
+
+        if (this.logInAttempt >= 5) {
+            if (this.status != MemberStatus.DELETED) {
+                return this.status = MemberStatus.LOCKED;
+            }
+        }
+
+        return this.status;
+    }
+
+    public void resetLogInAttempt() {
+        this.logInAttempt = 0;
+    }
+
+    public void updatePasswordVerificationCode(String passwordVerificationCode) {
+        this.passwordVerificationCode = passwordVerificationCode;
+    }
+
+    public void deletePasswordVerificationCode() {
+        this.passwordVerificationCode = "";
     }
 
     //== 테스트 로직 ==//
@@ -136,6 +172,10 @@ public class Member extends BaseEntity {
                 .city(address != null ? address.getCity() : null)
                 .street(address != null ? address.getStreet() : null)
                 .zipcode(address != null ? address.getZipcode() : null)
+                .status(status.toString())
+                .jwtId(jwt != null ? jwt.getId() : null)
+                .logInAttempt(logInAttempt)
+                .passwordVerificationCode(passwordVerificationCode != null ? passwordVerificationCode : null)
                 .build();
     }
 }

@@ -19,20 +19,14 @@ public class EmailService {
 
     @Transactional
     @Async
-    public String sendMail(Email email) {
-        try
-        {
-            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
-            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
-            mimeMessageHelper.setTo(email.getReceiver());
-            mimeMessageHelper.setSubject(email.getSubject());
-            mimeMessageHelper.setText(email.getMessage(), true);
-            javaMailSender.send(mimeMessage);
+    public String sendMail(Email email) throws MessagingException {
+        MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+        MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, false, "UTF-8");
+        mimeMessageHelper.setTo(email.getReceiver());
+        mimeMessageHelper.setSubject(email.getSubject());
+        mimeMessageHelper.setText(email.getMessage(), true);
+        javaMailSender.send(mimeMessage);
 
-            return "success";
-
-        } catch (MessagingException e) {
-            throw new RuntimeException(e);
-        }
+        return "success";
     }
 }

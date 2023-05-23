@@ -9,17 +9,24 @@ import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import site.mylittlestore.config.auth.member.PrincipalUserDetailsService;
+import org.springframework.transaction.annotation.Transactional;
+import site.mylittlestore.config.auth.PrincipalUserDetails;
+import site.mylittlestore.domain.member.Member;
+import site.mylittlestore.enumstorage.errormessage.MemberErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.EmailErrorMessage;
+import site.mylittlestore.enumstorage.errormessage.auth.LogInErrorMessage;
 import site.mylittlestore.enumstorage.errormessage.auth.PasswordErrorMessage;
+import site.mylittlestore.enumstorage.status.MemberStatus;
 import site.mylittlestore.exception.auth.EmailException;
 import site.mylittlestore.exception.auth.PasswordException;
+import site.mylittlestore.repository.member.MemberRepository;
 import site.mylittlestore.util.Validator;
 
 @Component
 @RequiredArgsConstructor
 public class MemberAuthenticationProvider implements AuthenticationProvider {
     private final PrincipalUserDetailsService principalUserDetailsService;
+    private final MemberRepository memberRepository;
     private final PasswordEncoder passwordEncoder;
     private final Validator validator;
 
@@ -30,26 +37,52 @@ public class MemberAuthenticationProvider implements AuthenticationProvider {
      * @throws AuthenticationException
      */
     @Override
-    public Authentication authenticate(Authentication authentication) throws AuthenticationException {
+    public Authentication authenticate(Authentication authentication) throws AuthenticationException, EmailException, PasswordException, BadCredentialsException {
         //email 검증
         String email = (String) authentication.getPrincipal();
-        if (!validator.isValidEmail(email) || email.isBlank()) {
-            throw new EmailException(EmailErrorMessage.NOT_VALID_EMAIL.getMessage());
+        if (!validator.isValidEmail(email)) {
+            throw new AuthenticationException(EmailErrorMessage.NOT_VALID_EMAIL.getMessage()) {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
         }
 
         //password 검증
         String password = (String) authentication.getCredentials();
         if (password.isBlank()) {
-            throw new PasswordException(PasswordErrorMessage.PASSWORD_IS_EMPTY.getMessage());
+            throw new AuthenticationException(PasswordErrorMessage.PASSWORD_IS_EMPTY.getMessage()) {
+                @Override
+                public String getMessage() {
+                    return super.getMessage();
+                }
+            };
         }
 
         //email로 회원정보 조회
         UserDetails user = principalUserDetailsService.loadUserByUsername(email);
 
+        PrincipalUserDetails principalUserDetails = (PrincipalUserDetails) user;
+        Member member = principalUserDetails.getMember();
+
+        //로그인 시도 횟수 증가
+        MemberStatus memberStatus = member.countUpLogInAttempt();
+        memberRepository.save(member);
+
+        //잠겨있는지 확인
+        if (memberStatus == MemberStatus.LOCKED) {
+            throw new BadCredentialsException(LogInErrorMessage.LOG_IN_ATTEMPT_EXCEEDED.getMessage());
+        }
+
         //비밀번호 일치 여부 확인
         if (!passwordEncoder.matches(password, user.getPassword())) {
             throw new BadCredentialsException(PasswordErrorMessage.PASSWORD_DOES_NOT_MATCH.getMessage());
         }
+
+        //로그인 성공했으므로, 로그인 시도 횟수 초기화
+        member.resetLogInAttempt();
+        memberRepository.save(member);
 
         return new UsernamePasswordAuthenticationToken(email, password, user.getAuthorities());
     }

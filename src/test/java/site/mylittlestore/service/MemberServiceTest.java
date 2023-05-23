@@ -208,7 +208,7 @@ class MemberServiceTest {
 
         //when
         //회원 조회
-        Member member = memberRepository.findActiveById(memberTestId)
+        Member member = memberRepository.findNotDeletedById(memberTestId)
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
 
         //then

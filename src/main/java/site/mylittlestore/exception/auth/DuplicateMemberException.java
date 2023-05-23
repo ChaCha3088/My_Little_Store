@@ -1,4 +1,4 @@
-package site.mylittlestore.exception.member;
+package site.mylittlestore.exception.auth;
 
 public class DuplicateMemberException extends RuntimeException {
     public DuplicateMemberException(String message) {

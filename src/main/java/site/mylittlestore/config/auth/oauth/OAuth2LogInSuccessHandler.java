@@ -7,7 +7,6 @@ import org.springframework.stereotype.Component;
 import site.mylittlestore.config.auth.PrincipalUserDetails;
 import site.mylittlestore.enumstorage.errormessage.auth.EmailErrorMessage;
 import site.mylittlestore.exception.auth.EmailException;
-import site.mylittlestore.exception.auth.jwt.NoSuchJwtException;
 import site.mylittlestore.service.auth.jwt.JwtService;
 
 import javax.servlet.ServletException;
@@ -38,14 +37,8 @@ public class OAuth2LogInSuccessHandler implements AuthenticationSuccessHandler {
         String email = Optional.ofNullable(principalUserDetails.getUsername())
                 .orElseThrow(() -> new EmailException(EmailErrorMessage.EMAIL_IS_EMPTY.getMessage()));
 
-        //AccessToken을 발급한다.
-        String accessToken = jwtService.createAccessToken(email);
-
-        //RefreshToken을 재발급한다.
-        String refreshToken = jwtService.createRefreshToken(email);
-
-        //AccessToken과 RefreshToken을 Header에 담아 보낸다.
-        jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
+        //token들을 발급한다.
+        jwtService.issueTokens(email, response);
 
         //OAuth2 로그인 성공 시, 메인 페이지로 이동
         response.setStatus(HttpServletResponse.SC_OK);

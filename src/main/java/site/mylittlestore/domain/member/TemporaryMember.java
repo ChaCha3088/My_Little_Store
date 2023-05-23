@@ -7,10 +7,7 @@ import lombok.NoArgsConstructor;
 import site.mylittlestore.domain.Address;
 import site.mylittlestore.entity.BaseEntity;
 
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotNull;
 
@@ -25,6 +22,7 @@ public class TemporaryMember extends BaseEntity {
     private String name;
 
     @NotBlank
+    @Column(unique = true)
     private String email;
 
     @NotBlank

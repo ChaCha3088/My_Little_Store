@@ -5,7 +5,9 @@ import site.mylittlestore.domain.member.Member;
 import java.util.Optional;
 
 public interface MemberRepositoryQueryDsl {
-    Optional<Member> findActiveById(Long id);
-    Optional<Member> findActiveByEmail(String email);
-    Optional<Long> findActiveIdByEmail(String email);
+    Optional<Member> findNotDeletedById(Long id);
+    Optional<Member> findNotDeletedByEmail(String email);
+    Optional<Member> findNotDeletedByPasswordVerificationCode(String passwordVerificationCode);
+    Optional<Long> findIdByEmail(String email);
+    Optional<Long> findNotDeletedIdByEmail(String email);
 }

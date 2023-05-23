@@ -119,7 +119,7 @@ public class StoreService {
     }
 
     private Member findMemberById(Long memberId) throws NoSuchMemberException {
-        return memberRepository.findActiveById(memberId)
+        return memberRepository.findNotDeletedById(memberId)
                 //해당하는 Id를 가진 회원이 없으면, 예외 발생
                 .orElseThrow(() -> new NoSuchMemberException(MemberErrorMessage.NO_SUCH_MEMBER.getMessage()));
     }

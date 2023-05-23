@@ -11,7 +11,6 @@ import site.mylittlestore.enumstorage.errormessage.StoreErrorMessage;
 import site.mylittlestore.exception.orderitem.NoSuchOrderItemException;
 import site.mylittlestore.exception.payment.PaymentAlreadyExistException;
 import site.mylittlestore.exception.store.StoreClosedException;
-import site.mylittlestore.message.Message;
 import site.mylittlestore.service.OrderItemService;
 import site.mylittlestore.service.PaymentMethodService;
 import site.mylittlestore.service.PaymentService;
@@ -38,28 +37,25 @@ public class PaymentController {
             //이미 결제가 진행중인 경우
             //해당 결제 페이지로 redirect
             //팝업 알림창
-            model.addAttribute("messages", Message.builder()
-                    .message(PaymentErrorMessage.PAYMENT_ALREADY_EXIST.getMessage())
-                    .href("/members/" + memberId + "/stores/" + storeId + "/storeTables/" + e.getStoreTableId() + "/orders/" + e.getOrderId())
-                    .build());
+            model.addAttribute("message", PaymentErrorMessage.PAYMENT_ALREADY_EXIST.getMessage())
+                    .addAttribute("href", "/members/" + memberId + "/stores/" + storeId + "/storeTables/" + e.getStoreTableId() + "/orders/" + e.getOrderId());
+
             return "message/message";
         } catch (NoSuchOrderItemException e) {
             //주문 상품이 없으면
             //주문 페이지로 redirect
             //팝업 알림창
-            model.addAttribute("messages", Message.builder()
-                    .message(OrderItemErrorMessage.NO_SUCH_ORDER_ITEM.getMessage())
-                    .href("/members/" + memberId + "/stores/" + storeId + "/storeTables/" + storeTableId + "/orders/" + e.getOrderId())
-                    .build());
+            model.addAttribute("message", OrderItemErrorMessage.NO_SUCH_ORDER_ITEM.getMessage())
+                    .addAttribute("href", "/members/" + memberId + "/stores/" + storeId + "/storeTables/" + storeTableId + "/orders/" + e.getOrderId());
+
             return "message/message";
         } catch (StoreClosedException e) {
             //가게가 닫혀있으면
             //가게 페이지로 redirect
             //팝업 알림창
-            model.addAttribute("messages", Message.builder()
-                    .message(StoreErrorMessage.STORE_CLOSED.getMessage())
-                    .href("/members/" + memberId + "/stores/" + storeId)
-                    .build());
+            model.addAttribute("message", StoreErrorMessage.STORE_CLOSED.getMessage())
+                    .addAttribute("href", "/members/" + memberId + "/stores/" + storeId);
+
             return "message/message";
         }
     }
@@ -73,10 +69,9 @@ public class PaymentController {
         //결제 중단 불가시
         //메시지 출력 후
         //payment 페이지로 redirect
-        model.addAttribute("messages", Message.builder()
-                .message(PaymentErrorMessage.PAYMENT_ABORT_NOT_AVAILABLE.getMessage())
-                .href("/members/" + memberId + "/stores/" + storeId + "/storeTables/" + storeTableId + "/orders/" + orderId + "/payments/" + paymentId)
-                .build());
+        model.addAttribute("message", PaymentErrorMessage.PAYMENT_ABORT_NOT_AVAILABLE.getMessage())
+                .addAttribute("href", "/members/" + memberId + "/stores/" + storeId + "/storeTables/" + storeTableId + "/orders/" + orderId + "/payments/" + paymentId);
+
         return "message/message";
     }
 
