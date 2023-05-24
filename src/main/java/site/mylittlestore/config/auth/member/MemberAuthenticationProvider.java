@@ -66,12 +66,8 @@ public class MemberAuthenticationProvider implements AuthenticationProvider {
         PrincipalUserDetails principalUserDetails = (PrincipalUserDetails) user;
         Member member = principalUserDetails.getMember();
 
-        //로그인 시도 횟수 증가
-        MemberStatus memberStatus = member.countUpLogInAttempt();
-        memberRepository.save(member);
-
         //잠겨있는지 확인
-        if (memberStatus == MemberStatus.LOCKED) {
+        if (member.getStatus() == MemberStatus.LOCKED) {
             throw new BadCredentialsException(LogInErrorMessage.LOG_IN_ATTEMPT_EXCEEDED.getMessage());
         }
 

@@ -117,7 +117,7 @@ public class AuthenticationProcessFilter extends OncePerRequestFilter {
                         return; //RefreshToken이 유효한 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않도록 바로 return으로 필터 진행 막기
                     }
 
-                    //refresh token인 유효하지 않거나 DB에 없으면, 인증 실패
+                    //refresh token인 유효하지 않거나 DB에 없거나 기한이 지났으면, 인증 실패
                     else {
                         //모든 토큰 삭제
                         jwtService.deleteAllTokens(response);
